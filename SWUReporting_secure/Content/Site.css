@@ -1,0 +1,112 @@
+﻿.form-inline .form-group {
+    margin-right:5px;
+}
+
+.modal
+{
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: black;
+    z-index: 99;
+    opacity: 0.3;
+    filter: alpha(opacity=30);
+    -moz-opacity: 0.3;
+    /*min-height: 100%;*/            
+}
+
+.modal-dialog {           
+    padding: 0;    
+    max-height: 600px;        
+    position: relative;
+    left: 0;
+    top: 0;
+    vertical-align: middle;
+}
+
+.modal-xl {
+    max-width: 80%;
+}
+.modal-body{    
+    max-height: 550px;    
+    overflow-y: auto;
+    /*overflow: scroll;*/    
+    /*background-color: black;*/
+}
+.loading
+{
+    font-family: Arial;
+    font-size: 10pt;
+    border: 5px solid #67CFF5;
+    width: 200px;
+    height: 100px;
+    display: none;
+    position: fixed;
+    background-color: White;
+    z-index: 999;
+    position: center;
+}
+
+.modalBackground
+{
+    background-color: Black;
+    filter: alpha(opacity=20);
+    opacity: 0.2;
+    text-align: center;
+}
+.modalPopup
+{
+    background-color: #FFFFFF;
+    border-width: 3px;
+    border-style: solid;
+    border-color: black;
+    padding-top: 10px;
+    padding-left: 10px;    
+    height: 140px;
+    position: relative;
+}
+
+/* Move down content because we have a fixed navbar that is 50px tall */
+body {
+    padding-top: 50px; /*was 150 - that was too much*/
+    padding-bottom: 20px;
+}
+
+/* Wrapping element */
+/* Set some basic padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Override table style for modal dialog*/
+.table-controls table {
+    vertical-align: middle;
+}
+
+
+/* Set widths on the form inputs since otherwise they're 100% wide */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="tel"],
+input[type="select"] {
+    max-width: 340px; /*was 280px*/
+}
+
+/* Responsive: Portrait tablets and up */
+@media screen and (min-width: 768px) {
+    .jumbotron {
+        margin-top: 20px;
+    }
+    .body-content {
+        padding: 0;
+    }
+}
