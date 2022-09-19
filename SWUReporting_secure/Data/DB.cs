@@ -120,8 +120,8 @@ namespace ReportBuilder
                 connString = ConfigurationManager.ConnectionStrings["SWUdbDebug"].ConnectionString;
 #endif
                 dbConn = new SqlConnection(connString);
-                dbConn.Open(); 
-            }                     
+                dbConn.Open();
+            }
         }
         public void Disconnect()
         {
@@ -129,7 +129,7 @@ namespace ReportBuilder
             {
                 deleteTempTable(TempTableName);
                 deleteTempTable(TempVTTableName);
-                
+
                 dbConn.Close();
                 dbConn.Dispose();
             }
@@ -140,7 +140,7 @@ namespace ReportBuilder
             if (!String.IsNullOrEmpty(tableName))
             {
                 //drop temp table if it exists
-                string query = "IF OBJECT_ID (N'" + tableName + "', N'U') IS NOT NULL DROP TABLE "+ tableName + ";";                
+                string query = "IF OBJECT_ID (N'" + tableName + "', N'U') IS NOT NULL DROP TABLE " + tableName + ";";
                 var res = SimpleQuery(query);
             }
         }
@@ -164,10 +164,15 @@ namespace ReportBuilder
         #endregion
 
         #region base SqlCommands
-        public int SimpleQuery(string query)
+        public int SimpleQuery(string query) 
         {
             SqlCommand cmd = new SqlCommand(query, dbConn);
             cmd = new SqlCommand(query, dbConn);
+            var rows = cmd.ExecuteNonQuery();
+            return rows;
+        }
+        public int SimpleQuery(string query,SqlCommand cmd)
+        {            
             var rows = cmd.ExecuteNonQuery();
             return rows;
         }
@@ -294,7 +299,7 @@ namespace ReportBuilder
             cmd.Parameters.AddWithValue("@varID", varID);
             return TableQuery(cmd, query);
         }
-         //passing -1 to the geoID argument returns all VAR Alias values
+        //passing -1 to the geoID argument returns all VAR Alias values
         public DataTable GetVARList(int geoID, string aliasFilter = "%", bool activeOnly = true)
         {
             string query;
@@ -303,7 +308,7 @@ namespace ReportBuilder
                 query = @"select ID, VAR_Alias, status, custom_targets, DashboardDate, CommunicationDate, [3dx], DW, EDU
                             from VARAlias
                             WHERE VAR_Alias like @aliasFilter AND VARAlias.status > @status                                                       
-                            ORDER BY status DESC, VAR_Alias";                
+                            ORDER BY status DESC, VAR_Alias";
             }
             else
             {
@@ -311,9 +316,9 @@ namespace ReportBuilder
                         from VARAlias                             
                         WHERE (geo_id = @geoID
                         or geo_id Is Null) AND VAR_Alias like @aliasFilter AND VARAlias.status > @status
-                        ORDER BY status DESC, VAR_Alias";                
+                        ORDER BY status DESC, VAR_Alias";
             }
-            
+
             SqlCommand cmd = new SqlCommand(query, dbConn);
             if (geoID != -1)
             {
@@ -350,10 +355,10 @@ namespace ReportBuilder
             }
             if (geoFilter == "")
             {
-                geoFilter = filter;                   
+                geoFilter = filter;
             }
             query += " ORDER BY Learners.Name;";
-            
+
             SqlCommand cmd = new SqlCommand(query, dbConn);
             cmd.Parameters.AddWithValue("@filter", filter);
             cmd.Parameters.AddWithValue("@geoFilter", geoFilter);
@@ -369,6 +374,20 @@ namespace ReportBuilder
             return TableQuery(cmd, query);
         }
 
+        public bool GetIfUserExits(string email)
+        {
+            string query = @"select email from Learners where email = @email;";
+            SqlCommand cmd = new SqlCommand(query, dbConn);
+            cmd.Parameters.AddWithValue("@email", email);
+            if( SimpleQuery(query,cmd) > 0)
+            {
+                return true;
+            }else
+            {
+                return false;
+            }
+  
+        }
         public DataTable GetCompanySearchRes(string filter)
         {
             string query = @"select VARs.ID, VARs.Name, VARAlias.VAR_Alias, VARParents.VAR_Parent, VARs.status
@@ -734,7 +753,7 @@ namespace ReportBuilder
             {
                 query = query.Replace("#ROLEFILTER#", " AND Learners.Role like @roleFilter ");
             }
-            
+
             SqlCommand cmd = new SqlCommand(query, dbConn);
             cmd.Parameters.AddWithValue("@varFilter", varFilter);
             cmd.Parameters.AddWithValue("@roleFilter", roleFilter);
@@ -914,7 +933,7 @@ namespace ReportBuilder
             cmd.Parameters.AddWithValue("@TechFTE", tfteVal);
             cmd.Parameters.AddWithValue("@salesGoal", SalesAlignmentGoal);
             cmd.Parameters.AddWithValue("@techGoal", TechSalesAlignmentGoal);
-            
+
             SqlDataAdapter sqlDa = new SqlDataAdapter();
             sqlDa.SelectCommand = cmd;
             DataTable dt = new DataTable();
@@ -928,7 +947,7 @@ namespace ReportBuilder
 
                 throw;
             }
-            
+
             if (dt.Rows.Count == 0)  //this should never happen with the new query method
             {
                 //enter zeros for all but FTE and Goal
@@ -1035,7 +1054,7 @@ namespace ReportBuilder
                 {
                     //ignore errors, could be a bad email address format
                 }
-                
+
                 Debug.Print("Updated " + rowCount.ToString() + " rows.");
                 if (rowCount != 0)
                 {
@@ -1051,10 +1070,10 @@ namespace ReportBuilder
         public void SetUserName(string userName, string newName)
         {
             string query = "UPDATE Learners SET [Name] = '" + newName + "' WHERE [Name] LIKE '" + userName + "'";
-            
+
             using (var cmd = new SqlCommand(query, dbConn))
             {
-                var rowCount = cmd.ExecuteNonQuery();                
+                var rowCount = cmd.ExecuteNonQuery();
             }
         }
 
@@ -1127,7 +1146,7 @@ namespace ReportBuilder
             }
             return tableName;
         }
-    
+
         public DataTable getRemainingFTEs(string varFilter = "%")
         {
             DataTable table = new DataTable();
@@ -1147,7 +1166,7 @@ namespace ReportBuilder
             table.Columns.Remove("ID");
             return table;
         }
-        
+
         //Obsolete
         public DataTable getTransposedReport4(string varFilter = "%", string profileFilter = "%", string geoFilter = "%")
         {
@@ -1280,7 +1299,7 @@ namespace ReportBuilder
             TableTools.Type TableType = TableTools.Type.tableSalesTransposed)
         {
             DataTable table = new DataTable();
-            
+
             string tableName = TableType == TableTools.Type.tableSalesTransposed ? TempTableName : TempVTTableName;
             string query = @"select * from " + tableName + " where [VAR Alias] like @var";
 
@@ -1861,7 +1880,7 @@ namespace ReportBuilder
             {
                 cmd.Parameters.Add("@VARFilter", SqlDbType.VarChar).Value = varFilter;
                 cmd.Parameters.Add("@ProfileFilter", SqlDbType.VarChar).Value = profileFilter;
-                cmd.Parameters.Add("@GeoFilter", SqlDbType.VarChar).Value = geoFilter;                
+                cmd.Parameters.Add("@GeoFilter", SqlDbType.VarChar).Value = geoFilter;
                 cmd.Parameters.Add("@RoleFilter", SqlDbType.VarChar).Value = roleFilter;
                 cmd.Parameters.AddWithValue("@courseFilter", courseFilter);
                 return TableQuery(cmd, query);
@@ -2361,8 +2380,8 @@ namespace ReportBuilder
         {
             DataTable table = new DataTable();
             string query;
-            query = (style == VARGrouping.byVARAlias) ? 
-                @"SELECT * FROM FTEValuesAlias WHERE VAR like @VARFilter and GEO like @GEOFilter ORDER BY GEO, VAR" : 
+            query = (style == VARGrouping.byVARAlias) ?
+                @"SELECT * FROM FTEValuesAlias WHERE VAR like @VARFilter and GEO like @GEOFilter ORDER BY GEO, VAR" :
                 @"SELECT * FROM FTEValuesParent WHERE VAR like @VARFilter and GEO like @GEOFilter ORDER BY GEO, VAR";
             using (var cmd = new SqlCommand(query, dbConn))
             {
@@ -2426,7 +2445,7 @@ namespace ReportBuilder
         {
             string query = "dbo.spDeleteUnenrolled";
             SqlCommand cmd = new SqlCommand(query, dbConn);
-            cmd.CommandType = CommandType.StoredProcedure;            
+            cmd.CommandType = CommandType.StoredProcedure;
             int res = cmd.ExecuteNonQuery();
             return res;
         }
@@ -2450,7 +2469,7 @@ namespace ReportBuilder
 
         #region Nikhil Queries
 
-        public List<string> getUsers()
+        public List<string> getAdminUsers()
         {
             string usersquery = "SELECT Trigram FROM dbo.Users WHERE [Admin] = 0";
             List<string> users = new List<string>();
@@ -2460,14 +2479,13 @@ namespace ReportBuilder
                 while (reader.Read())
                 {
                     var trigrams = reader.GetString(0);
-                    
+
                     //hide menus from non-admins                                                                           
-                        users.Add(trigrams);                    
+                    users.Add(trigrams);
                 }
             }
             return users;
         }
-
 
         
         #endregion

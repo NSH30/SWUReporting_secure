@@ -39,7 +39,7 @@ namespace SWUReporting
                 lblStats.Text = sb.ToString();
                 lblStats.Visible = true;
                 db.Connect();
-                 List<string> users = db.getUsers();
+                 List<string> users = db.getAdminUsers();
                                                                                                        
                   //hide menus from non-admins                                    
                 foreach (var items in users)

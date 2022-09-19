@@ -609,6 +609,20 @@ namespace ReportBuilder
                 db.SetUserName(userName: userDef.userName, newName: userDef.newName);
             }
         }
+
+        public string getMissingEmails(List<string> emails)
+        {
+            Report r = new Report();
+            r.CountOnly = true;
+            r.Type = Report.reportType.unknown;
+
+            foreach (var email in emails)
+            {
+                var res = db.GetIfUserExits(email: email);
+                if (!res) { r.AddLine(email); }
+            }
+            return r.Message;
+        }
         #endregion
 
         #region ReportManipulation
@@ -763,6 +777,36 @@ namespace ReportBuilder
         #endregion
 
         #region DataManipluation
+        public Report BatchLoadActivities(string CourseName, DateTime date, List<string> emails)
+        {
+            Report r = new Report();
+            //TODO: 
+            //Course class
+            Course c = new Course(db);
+            //if the course exists, use it
+            //else, create a new one
+
+            //if it was existing
+            r.Type = Report.reportType.unknown;
+            r.AddLine( "course exists");
+
+            //learners class (Instantiating new learners)
+            foreach (var email in emails)
+            {
+                Learner l = new Learner(db);
+                l.GetLearnerByEmail(email, db.dbConn);
+                Activity a = new Activity(db);
+                a.course = c;
+                a.completionDate = date;
+                a.startDate = date;
+                a.enrollDate = date;
+                a.learner = l;
+                a.Insert();
+            }
+            //Create Acti
+            return r;
+        }
+    
         /// <summary>
         /// Batch import all records from lists, then do database cleanup
         /// </summary>

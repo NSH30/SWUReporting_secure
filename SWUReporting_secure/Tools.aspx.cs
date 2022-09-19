@@ -33,6 +33,12 @@ namespace SWUReporting
             ModalPopupExtender1.Show();
         }
 
+        protected void btnAddCourse_Click(object sender, EventArgs e)
+        {
+            ModalPopupExtender2.Show();
+        }
+
+
         protected void btnClose_Click(object sender, EventArgs e)
         {
 
@@ -84,6 +90,53 @@ namespace SWUReporting
             //db.Disconnect();
             //res.TableName = "RawLearnerData";
             //DBReporting.DownloadSingleSheet(res);
+        }
+
+        protected void btnCheck_Click(object sender, EventArgs e)
+        {
+            string emailVal = tbEmailsCheck.Text;
+            string results = null;
+            List<string> emails = new List<string>(
+                emailVal.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries));
+            if (emails.Count != 0)
+            {
+                DBReporting dbr = new DBReporting();
+                DB db = new DB();
+                db.Connect();
+                DBReporting.db = db;            
+                results = dbr.getMissingEmails(emails: emails);
+                db.Disconnect();
+            }
+            else
+            {
+                //some error or warning back to the user
+            }
+            if (results == "0")
+            {
+                lblBDResponse.CssClass = "label label-warning";
+                lblBDResponse.Text = "No learners updated.";
+            }
+            else
+            {
+                lblBDResponse.CssClass = "label label-info";
+                lblBDResponse.Text = results;
+            }
+        }
+
+        protected void btnUpdateCourse_Click(object sender, EventArgs e)
+        {
+            DBReporting dbr = new DBReporting();
+            DB db = new DB();
+            db.Connect();
+            DBReporting.db = db;
+            //Report r = dbr.BatchLoadActivities();
+            Messaging.SendAlert(r.Message, this.Page);
+            //or use a label
+        }
+
+        protected void btnCloseCourse_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
