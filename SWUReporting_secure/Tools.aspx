@@ -30,10 +30,12 @@
         </div>
         <div >
             <br />
-            <asp:Button ID="btnAddCourse" Text="Add Courses" CssClass="btn btn-primary" runat="server" OnClick="btnAddCourse_Click"/>
+            <asp:Button ID="btnAddCourse" Text="Add" CssClass="btn btn-primary" runat="server" OnClick="btnAddCourse_Click"/>
         </div>  
         <br />
-        <asp:Label ID="lblADResponse" Text ="" CssClass="label label-info" runat="server"></asp:Label>      
+        <div class="card">
+            <asp:TextBox ID="tbMessage" runat="server" BorderStyle="None" TextMode="MultiLine" Rows="10" Visible="False" Width="100%"></asp:TextBox>
+        </div>     
     </div>
 
 <%--    <div class="container p-5 shadow" style="background-color:whitesmoke">
@@ -65,16 +67,16 @@
                     <p>Completion Date: &nbsp <asp:TextBox ID="tbDate" CssClass="form-control" Width="250px" runat="server" type="date" MaxLength="9" Rows="1"></asp:TextBox></p>
                     <p>Learner emails:<asp:TextBox ID="tbEmailsCheck" CssClass="form-control" runat="server" Rows="5" TextMode="MultiLine"></asp:TextBox>
                     </p>
-                    <asp:Button ID="btnCheck" runat="server" Text="Check Email" CssClass="modal-close btn" OnClick="btnCheck_Click" />
+                    <asp:Button ID="btnCheck" runat="server" Text="Check Email" CssClass="modal-close btn" OnClick="btnCheck_Click" Visible="False" />
                 </div>
                 <div class="modal-footer">
                     <asp:Button ID="btnUpdateCourse" runat="server" Text="Update" CssClass="btn btn-primary" OnClick="btnUpdateCourse_Click" />
-                    <asp:Button ID="btnCloseCourse" runat="server" Text="Close" CssClass="modal-close btn" OnClick="btnCloseCourse_Click" />
-                    
-                </div>
+                    <asp:Button ID="btnCloseCourse" runat="server" Text="Close" CssClass="modal-close btn" OnClick="btnCloseCourse_Click" />                    
+                </div>                
             </div>
         </div>
     </asp:Panel>
+
 
     <cc1:ModalPopupExtender ID="ModalPopupExtender1" BehaviorID="mpe2" runat="server" PopupControlID="pnlEmails" TargetControlID="lnkDummy" BackgroundCssClass="modalBackground" CancelControlID="btnClose"/>
     <asp:Panel ID="pnlEmails" runat="server" CssClass="modal-dialog" style="display:none;"> <!-- was CssClass "panel" -->

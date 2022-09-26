@@ -148,6 +148,11 @@ namespace ReportBuilder
             return fRes;
         }
 
+        //internal Report BatchLoadActivities(Course c)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
         public static DataTable ftes
         {
             get
@@ -783,27 +788,40 @@ namespace ReportBuilder
             //TODO: 
             //Course class
             Course c = new Course(db);
-            //if the course exists, use it
-            //else, create a new one
-
+            c.Name = CourseName;
+            c.Type = "Course";
+            c.Insert();
+            r.AddLine(String.Format("Course Name: {0} ", c.Name));
+            r.AddLine("Add or verify any required course alias mapping.");
+                
             //if it was existing
-            r.Type = Report.reportType.unknown;
-            r.AddLine( "course exists");
+            //r.Type = Report.reportType.unknown;
+            //r.AddLine("course exists");
+            //if the course exists, use it
+            //else, create a new one            
 
             //learners class (Instantiating new learners)
             foreach (var email in emails)
             {
                 Learner l = new Learner(db);
                 l.GetLearnerByEmail(email, db.dbConn);
+                if (l.Name == null)
+                {
+                    r.AddLine(String.Format("Learner email: {0} does not exist in the database.", email));
+                }
+                else { 
                 Activity a = new Activity(db);
                 a.course = c;
                 a.completionDate = date;
                 a.startDate = date;
                 a.enrollDate = date;
                 a.learner = l;
+                a.status =  "Completed";
                 a.Insert();
+                    r.AddLine(String.Format("Course completion added for {0} {1}", l.Name, email));
+                }
             }
-            //Create Acti
+
             return r;
         }
     

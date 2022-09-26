@@ -58,13 +58,13 @@ namespace SWUReporting {
         protected global::System.Web.UI.WebControls.Button btnAddCourse;
         
         /// <summary>
-        /// lblADResponse control.
+        /// tbMessage control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblADResponse;
+        protected global::System.Web.UI.WebControls.TextBox tbMessage;
         
         /// <summary>
         /// ModalPopupExtender2 control.

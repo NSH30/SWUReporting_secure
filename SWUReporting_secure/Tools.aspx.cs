@@ -109,7 +109,7 @@ namespace SWUReporting
             }
             else
             {
-                //some error or warning back to the user
+                //some error or warning back to the user                
             }
             if (results == "0")
             {
@@ -125,13 +125,30 @@ namespace SWUReporting
 
         protected void btnUpdateCourse_Click(object sender, EventArgs e)
         {
+            string emailVal = tbEmailsCheck.Text;           ;
+
+            if(tbName.Text == String.Empty) {
+                Messaging.SendAlert("Please enter a course name",this.Page);
+                return;
+            }
+            if (tbDate.Text == String.Empty)
+            {
+                Messaging.SendAlert("Please enter a Date", this.Page);
+                return;
+            }
+            DateTime CourseDate = DateTime.Parse(tbDate.Text);
+            String CourseName = tbName.Text;
+
+            List<string> emails = new List<string>(
+                emailVal.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries));
             DBReporting dbr = new DBReporting();
             DB db = new DB();
+            Report r = new Report();
             db.Connect();
             DBReporting.db = db;
-            //Report r = dbr.BatchLoadActivities();
-            Messaging.SendAlert(r.Message, this.Page);
-            //or use a label
+            r = dbr.BatchLoadActivities(CourseName,CourseDate,emails);
+            tbMessage.Text = r.Message;
+            tbMessage.Visible = true;
         }
 
         protected void btnCloseCourse_Click(object sender, EventArgs e)
