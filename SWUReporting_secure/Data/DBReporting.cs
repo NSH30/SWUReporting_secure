@@ -210,6 +210,13 @@ namespace ReportBuilder
         #endregion
 
         #region Report Creator Functions
+        /// <summary>
+        /// Generate VAR Report files on the server
+        /// </summary>
+        /// <param name="vars">list of VAR names</param>
+        /// <param name="report">Report class instance for information</param>
+        /// <param name="folderName">The output folder path on the server</param>
+        /// <returns>A List of file paths (string)</returns>
         public List<string> ReportMulipleVARs2(List<string> vars, out Report report, string folderName = "")
         {
             Report r = new Report();
@@ -226,9 +233,12 @@ namespace ReportBuilder
             }
             
             db.CreateTransposedVTTempTable();  //technical cert table
+            if (!SharedTools.IsQ4()) { db.SetVARParentFTEValues(); }  //freeze FTE values in Q4
+            db.CreateAlignmentData(); //alignment data in a datatable
             foreach (string var in vars)
             {
                 varFilter = var;
+                //create one multi-sheet excel file for the VAR
                 string vRep = ReportVAR(folderName: folderName);
                 if (vRep.StartsWith("ERROR:"))
                 {
@@ -305,7 +315,7 @@ namespace ReportBuilder
             ds.Tables.Add(dtTrans);
 
             //sheet 10 FTE and Alignment
-            DataTable dtA = db.getAlignmentReport(varFilter: varFilter);
+            DataTable dtA = db.getAlignmentReport2(varFilter: varFilter);
             dtA.TableName = sheetNames[9];
             ds.Tables.Add(dtA);
 
@@ -337,6 +347,12 @@ namespace ReportBuilder
             return saveRes;
 
         }
+
+        /// <summary>
+        /// standard set of GEO report files created on the server
+        /// </summary>
+        /// <param name="status">True = success</param>
+        /// <returns>An array of file paths on the server</returns>
         public string[] CreateGEOReportFiles(out bool status)
         {
             string path = "";
@@ -345,8 +361,10 @@ namespace ReportBuilder
             try
             {
                 string[] sheetNames;
-                ds = ReportGEO(out sheetNames);
-                //OExcelNew oen = new OExcelNew();
+                
+                //Get the dataset of tables to publish to excel
+                ds = ReportGEO(out sheetNames, !SharedTools.IsQ4());  //only update FTE values if it is not Q4
+                
                 string fileName = "Master Learner Transcript.xlsx";
                 DataSet smallDS = new DataSet();
                 string[] smallSheetNames = new string[3];
@@ -477,9 +495,10 @@ namespace ReportBuilder
         /// <summary>
         /// Generate all GEO reports into one dataset containing individual datatables
         /// </summary>
-        /// <param name="sheetNames"></param>
+        /// <param name="sheetNames">returns all sheet names in the dataset</param>
+        /// <param name="UpdateFTEVals">true to update FTEValues, false to skip in Q4</param>
         /// <returns></returns>
-        public DataSet ReportGEO(out string[] sheetNames)
+        public DataSet ReportGEO(out string[] sheetNames, bool UpdateFTEVals = true)
         {
             VARFilter = "%";
             sheetNames = new string[] { "3DEXP Certification Quarterly", "3DX Export", "Sales Skills", "Other Products",
@@ -559,6 +578,7 @@ namespace ReportBuilder
 
             //alignment
             //excel
+            if (UpdateFTEVals){ db.SetVARParentFTEValues(); }
             DataTable dtAlign = db.getAlignmentByGEO4(varFilter: "%", geoFilter: "%");
             dtAlign.TableName = sheetNames[7];
             db.Disconnect();

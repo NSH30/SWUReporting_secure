@@ -88,6 +88,7 @@ namespace SWUReporting
             List<string> serverFiles = new List<string>();
             try
             {
+                //create standard report files on the server
                 serverFiles.AddRange(dbr.CreateGEOReportFiles(out status));
             }
             catch (Exception ex)
@@ -141,6 +142,11 @@ namespace SWUReporting
             }
         }
 
+        /// <summary>
+        /// Download button event for selected VARs from GEO-filtered list
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void btnVARReport_Click(object sender, EventArgs e)
         {
             //create and download all VAR reports from selected list

@@ -1,7 +1,8 @@
 ﻿using System.Web.UI.WebControls;
 using System.Drawing;
+using System;
 
-namespace SWUReporting.Data
+namespace SWUReporting
 {
     public class SharedTools
     {
@@ -11,6 +12,12 @@ namespace SWUReporting.Data
             {
                 e.Row.ForeColor = color;
             }
+        }
+        public static bool IsQ4()
+        {
+            DateTime dt = DateTime.Today;
+            bool isQ4 = dt.Month > 9 ? false : true;
+            return isQ4;
         }
     }
 }

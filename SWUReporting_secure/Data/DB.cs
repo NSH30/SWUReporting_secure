@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Data;
 using System.Configuration;
 using SWUReporting;
+using System.Linq;
 
 namespace ReportBuilder
 {
@@ -42,8 +43,11 @@ namespace ReportBuilder
             }
         }
 
+        private DataTable AlignmentData { get; set; }
+
         public string TempTableName { get; set; }
         public string TempVTTableName { get; set; }
+        
 
         public int SalesAlignmentGoal
         {
@@ -152,14 +156,20 @@ namespace ReportBuilder
             Connect();
         }
 
+        /// <summary>
+        /// Primary constructor
+        /// </summary>
+        /// <param name="tempTableName">Temp table name structure</param>
         public DB(string tempTableName)
         {
             Connect();
             TempTableName = tempTableName;
             TempVTTableName = TempTableName + "VT";
-            //delete the temp table in case it already exists
+            
+            //delete the temp table(s) in case it already exists
             deleteTempTable(TempTableName);
             deleteTempTable(TempVTTableName);
+
         }
         #endregion
 
@@ -226,15 +236,64 @@ namespace ReportBuilder
         /// <param name="cmd"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public DataTable TableQuery(SqlCommand cmd, string query)
+        public DataTable TableQuery(SqlCommand cmd, string query = "")
         {
             SqlDataAdapter sqlDa = new SqlDataAdapter();
-            cmd.CommandText = query;
+            if (query != "") { cmd.CommandText = query;}            
             cmd.Connection = dbConn;
             sqlDa.SelectCommand = cmd;
             DataTable dt = new DataTable();
             sqlDa.Fill(dt);
             return dt;
+        }
+
+        /// <summary>
+        /// Create a temp table from the Alignment Report query
+        /// </summary>
+        internal void CreateAlignmentData()
+        {
+            AlignmentData = getAlignmentByGEO4("%", "%");
+            //re-format the datatable and add KPI points and color columns
+            AlignmentData.Columns.Remove("GEO");
+            AlignmentData.Columns["TotalAchievement"].ColumnName = "TotalPoints";
+            AlignmentData.Columns["WeightedAchievement"].ColumnName = "Weighted Achievement";
+            AlignmentData.Columns["Tech FTEs"].ColumnName = "TechFTE";
+            AlignmentData.Columns["TechTotalAchievement"].ColumnName = "TechTotalPoints";
+            AlignmentData.Columns["Tech Weighted Achievement"].ColumnName = "TechWeightedAchievement";
+            //AlignmentData.Columns["Tech Weighted Achievement"].ColumnName = "TechWeightedAchievement";
+            AlignmentData.Columns.Add("Points");
+            AlignmentData.Columns.Add("TechPoints");
+            AlignmentData.Columns.Add("sBackground");
+            AlignmentData.Columns.Add("tBackground");
+            int salesGoal = SalesAlignmentGoal;
+            int techGoal = TechSalesAlignmentGoal;
+
+            foreach (DataRow r in AlignmentData.Rows)
+            {
+                //var data = r.ItemArray;
+                r.BeginEdit();
+                if(r.Field<decimal>("Weighted Achievement") > salesGoal)
+                {
+                    r["Points"] = 10;
+                    r["sBackground"] = "green";
+                }
+                else
+                {
+                    r["Points"] = 0;
+                    r["sBackground"] = "orange";
+                }
+                if (r.Field<decimal>("TechWeightedAchievement") > techGoal)
+                {
+                    r["TechPoints"] = 10;
+                    r["tBackground"] = "green";
+                }
+                else
+                {
+                    r["TechPoints"] = 0;
+                    r["tBackground"] = "orange";
+                }
+                r.EndEdit();                
+            }
         }
 
         #endregion
@@ -762,12 +821,35 @@ namespace ReportBuilder
             return TableQuery(cmd, query);
         }
 
-        //2022 version with sales and tech sales alignment data - using temp tables
-        internal DataTable getAlignmentByGEO4(string varFilter, string geoFilter, string roleFilter = "[siv]%")
+        /// <summary>
+        /// Generate alignment report based on VARParents
+        /// </summary>
+        /// <param name="varFilter"></param>
+        /// <param name="geoFilter"></param>
+        /// <param name="roleFilter"></param>
+        /// <returns></returns>
+        internal DataTable getAlignmentByGEO4(string varFilter, string geoFilter)
         {
+            SqlCommand cmd = SetAlignmentQueryCommand(varFilter, geoFilter);
+            return TableQuery(cmd);
+
+        }
+
+        /// <summary>
+        /// Alignment report query SqlCommand builder
+        /// </summary>
+        /// <param name="varFilter"></param>
+        /// <param name="geoFilter"></param>
+        /// <returns></returns>
+        private SqlCommand SetAlignmentQueryCommand(string varFilter, string geoFilter)
+        {
+            string roleFilter = "[siv]%"; //only for sales calculations
             string query = @"--learner course completions into temp table
-                            select distinct l.ID as lID, g.ID as GEOID, ca.CourseNameAlias, l.Name, ca.alignment_points, vp.VAR_Parent, vp.ID as vID, a.status
-		                            INTO #tempTable from Learners l join VARs on VARs.ID = l.var_id
+                            SELECT t1.lID, vp.GEOID, t1.CourseNameAlias, t1.alignment_points, t1.Name, t1.status, vp.VAR_Parent, vp.ID vID 
+                            INTO #tempTable 
+                            from (select distinct l.ID as lID, g.ID as GEOID, ca.CourseNameAlias, l.Name, ca.alignment_points, vp.VAR_Parent, vp.ID as vID, a.status
+		                            from Learners l 
+		                            join VARs on VARs.ID = l.var_id
 	                                join VARParents vp on vp.ID = VARs.var_parent_id
                                     join Activities a on a.learner_id = l.ID
                                     join Courses c on c.ID = a.course_id
@@ -778,7 +860,7 @@ namespace ReportBuilder
                                     AND a.status = 'Completed' AND l.userState = 'ACTIVE' AND l.Role like @roleFilter
                                     AND alignment_points > 0 AND ca.kpi = 1  --sales courses only 
 	                                AND g.GEO like @geofilter AND VAR_Parent not like 'solidworks corp.'  --ignore DS employees
-                                    AND va.status = 1  --active VARs only
+                                    AND va.status = 1) as T1 full outer join ActiveVARParents vp on T1.vID = vp.ID
 
                             /* create temp table of all tech sales completions */
                             select distinct l.ID as lID, g.ID as GEOID, ca.CourseNameAlias
@@ -808,43 +890,36 @@ namespace ReportBuilder
 	                            group by tt.vID;
 
 	                            /* make FTE temp table */
-	                            select ISNULL(SUM(l.fte_value),0) as fteVal, vp.ID as vID
-	                            into #ftes from Learners l
-	                            join VARs v on v.ID = l.var_id
-	                            join VARParents vp on vp.ID = v.var_parent_id
-	                            where l.userState = 'ACTIVE' and l.Role like @roleFilter group by vp.ID
-
+                                select FTESales as fteVal, ID as vID into #ftes from VARParents 
 	                            /* make tech FTE temp table */
-	                            select ISNULL(COUNT(l.email), 0) as fteVal, vp.ID as vID
-	                            into #techFTEs from Learners l 
-	                            join VARs v on v.ID = l.var_id
-	                            join VARParents vp on vp.ID = v.var_parent_id
-	                            where l.userState = 'ACTIVE' AND (l.Role like 'tech%sales' OR l.Role like 'tech%manag%')
-	                            group by vp.ID
+	                            select FTETech as fteVal, ID as vID into #techFTEs from VARParents
 
 	                            /* create the report output from the temp tables */
-	                            select g.GEO, t.VAR_Parent as [VAR], f.fteVal as [FTE Value], (SUM(t.alignment_points) + ISNULL(b.bonus, 0)) as TotalAchievement
-	                            , CONVERT(DECIMAL(6,1),ISNULL((SUM(t.alignment_points) + ISNULL(b.bonus,0))/NULLIF(f.fteVal,0),0)) as WeightedAchievment
-	                            , ISNULL(tf.fteVal, 0) as [Tech FTEs], ISNULL(tt.alignment_points,0) as [TechTotalAchievement]
-	                            , CONVERT(decimal(6,1),ISNULL(tt.alignment_points/NULLIF(tf.fteVal,0), 0)) as [Tech Weighted Achievement]
-	                            from #tempTable t join GEOs g on t.GEOID = g.ID
-	                            join #ftes f on f.vID = t.vID
-	                            left outer join #bonus b on b.vID = t.vID
-	                            left outer join #techFTEs tf on tf.vID = t.vID
-	                            /* need to sum the tech points before joining */
-	                            left outer join (select SUM(ttt.alignment_points) as [alignment_points], ttt.vID from #tempTechTable ttt group by ttt.vID) as tt on tt.vID = t.vID
-	                            group by t.VAR_Parent, g.GEO, t.vID, f.fteVal, b.bonus, tf.fteVal, tt.alignment_points
-	                            ORDER BY g.GEO, t.VAR_Parent";
+	                            select g.GEO, t.VAR_Parent as [VAR], f.fteVal as [FTE Value], ISNULL((SUM(t.alignment_points) + ISNULL(b.bonus, 0)), 0) as TotalAchievement
+	                                , CONVERT(DECIMAL(6,1),ISNULL((SUM(t.alignment_points) + ISNULL(b.bonus,0))/NULLIF(f.fteVal,0),0)) as WeightedAchievement
+	                                , ISNULL(tf.fteVal, 0) as [Tech FTEs], ISNULL(tt.alignment_points,0) as [TechTotalAchievement]
+	                                , CONVERT(decimal(6,1),ISNULL(tt.alignment_points/NULLIF(tf.fteVal,0), 0)) as [Tech Weighted Achievement]
+	                                from #tempTable t join GEOs g on t.GEOID = g.ID
+	                                full outer join #ftes f on f.vID = t.vID
+	                                left outer join #bonus b on b.vID = t.vID
+	                                left outer join #techFTEs tf on tf.vID = t.vID
+	                                /* need to sum the tech points before joining */
+	                                left outer join (select SUM(ttt.alignment_points) as [alignment_points], ttt.vID from #tempTechTable ttt group by ttt.vID) as tt on tt.vID = t.vID
+	                                where t.VAR_Parent is not null group by t.VAR_Parent, g.GEO, t.vID, f.fteVal, b.bonus, tf.fteVal, tt.alignment_points
+	                                ORDER BY g.GEO, t.VAR_Parent";
             SqlCommand cmd = new SqlCommand(query, dbConn);
             cmd.Parameters.AddWithValue("@varFilter", varFilter);
             cmd.Parameters.AddWithValue("@roleFilter", roleFilter);
             cmd.Parameters.AddWithValue("@geoFilter", geoFilter);
             cmd.Parameters.AddWithValue("@salesGoal", SalesAlignmentGoal);
-            return TableQuery(cmd, query);
-
+            return cmd;
         }
 
-        //reports both sales and tech sales as of feb 18, 2022
+        /// <summary>
+        /// OBSOLETE: VAR Alignment report table for VAR dashboards
+        /// </summary>
+        /// <param name="varFilter"></param>
+        /// <returns>Report in a DataTable</returns>
         internal DataTable getAlignmentReport(string varFilter)
         {
             string query;
@@ -955,6 +1030,20 @@ namespace ReportBuilder
             }
             return dt;
         }
+
+        /// <summary>
+        /// VAR Alignment report table for VAR dashboards
+        /// </summary>
+        /// <param name="varFilter"></param>
+        /// <returns>Report in a DataTable</returns>
+        internal DataTable getAlignmentReport2(string varFilter)
+        {
+            //query row out of AlignmentData
+            var dataRow = AlignmentData.AsEnumerable().Where(x => x.Field<string>("VAR") == varFilter);            
+            DataTable dt = dataRow.CopyToDataTable<DataRow>();
+            return dt;            
+        }
+
 
         /// <summary>
         /// Get the total points from a var for a given KPI role
@@ -1267,7 +1356,6 @@ namespace ReportBuilder
                         update FTETemp set email = 'claude.ribagnac@visiativ.com' where email = 'cribagnac@axemble.com'
                         update FTETemp set email = 'kevin.poulain@visiativ.com' where email = 'kpoulain@axemble.com'
                         update FTETemp set email = 'michael.fenaut@visiativ.com' where email = 'mfenaut@axemble.com'
-                        update FTETemp set email = 'chrisk@hawkridgesys.com' where email = 'ckresic@design-point.com'
                         update FTETemp set email = 'philippe.couet@visiativ.com' where email = 'pcouet@axemble.com'
                         delete from FTETemp where email = 'praveen.rao@beacoa.n-indicom' --duplicate
                         update FTETemp set email = 'seamus@solidsolutions.ie' where email = 'sshanahan@solidsolutions.ie'
@@ -1287,6 +1375,19 @@ namespace ReportBuilder
             string query = @"UPDATE Learners
                             SET Learners.fte_value = 0
                             WHERE Learners.email NOT LIKE 'fte@%'";  //ignore japan FTE learners            
+            SimpleQuery(query);
+        }
+
+        /// <summary>
+        /// Reset and Load Sales and Tech FTE values into VARParents table
+        /// </summary>
+        internal void SetVARParentFTEValues()
+        {
+            string query = @"update varparents set ftetech = 0, ftesales = 0
+                            update VARParents set VARParents.FTETech = FTETechSalesValuesParent.[FTE Value] 
+                            from FTETechSalesValuesParent where VARParents.ID = FTETechSalesValuesParent.ID;
+                            update varparents set varparents.ftesales = ftevaluesparent.[fte value]
+                            from ftevaluesparent where varparents.id = ftevaluesparent.id;";
             SimpleQuery(query);
         }
 
@@ -2274,7 +2375,7 @@ namespace ReportBuilder
         internal void addVARParentsFromTempTable(string tableName)
         {
             string query = @"INSERT INTO VARParents
-                            SELECT DISTINCT Organization as VAR_Parent FROM VARParents RIGHT OUTER JOIN TEMPTABLE tt on tt.Organization = VARParents.VAR_Parent 
+                            SELECT DISTINCT Organization as VAR_Parent, null as FTESales, null as FTETech FROM VARParents RIGHT OUTER JOIN TEMPTABLE tt on tt.Organization = VARParents.VAR_Parent 
                             WHERE VARParents.ID is null AND tt.[Account Status] = 'Active' AND Organization not like '%terminated%';";
             query = query.Replace("TEMPTABLE", tableName);
             SimpleQuery(query);
