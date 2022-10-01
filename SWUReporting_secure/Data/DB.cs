@@ -252,7 +252,7 @@ namespace ReportBuilder
         /// </summary>
         internal void CreateAlignmentData()
         {
-            AlignmentData = getAlignmentByGEO4("%", "%");
+            AlignmentData = getAlignmentByVAR("%", "%");
             //re-format the datatable and add KPI points and color columns
             AlignmentData.Columns.Remove("GEO");
             AlignmentData.Columns["TotalAchievement"].ColumnName = "TotalPoints";
@@ -830,19 +830,6 @@ namespace ReportBuilder
         /// <returns></returns>
         internal DataTable getAlignmentByGEO4(string varFilter, string geoFilter)
         {
-            SqlCommand cmd = SetAlignmentQueryCommand(varFilter, geoFilter);
-            return TableQuery(cmd);
-
-        }
-
-        /// <summary>
-        /// Alignment report query SqlCommand builder
-        /// </summary>
-        /// <param name="varFilter"></param>
-        /// <param name="geoFilter"></param>
-        /// <returns></returns>
-        private SqlCommand SetAlignmentQueryCommand(string varFilter, string geoFilter)
-        {
             string roleFilter = "[siv]%"; //only for sales calculations
             string query = @"--learner course completions into temp table
                             SELECT t1.lID, vp.GEOID, t1.CourseNameAlias, t1.alignment_points, t1.Name, t1.status, vp.VAR_Parent, vp.ID vID 
@@ -912,7 +899,98 @@ namespace ReportBuilder
             cmd.Parameters.AddWithValue("@roleFilter", roleFilter);
             cmd.Parameters.AddWithValue("@geoFilter", geoFilter);
             cmd.Parameters.AddWithValue("@salesGoal", SalesAlignmentGoal);
-            return cmd;
+            return TableQuery(cmd);
+
+        }
+
+        /// <summary>
+        /// Generate alignment report based on VARAlias
+        /// </summary>
+        /// <param name="varFilter"></param>
+        /// <param name="geoFilter"></param>
+        /// <param name="roleFilter"></param>
+        /// <returns></returns>
+        internal DataTable getAlignmentByVAR(string varFilter, string geoFilter)
+        {
+            string roleFilter = "[siv]%"; //only for sales calculations
+            string query = @"--learner course completions into temp table
+                            SELECT t1.lID, T1.GEOID, t1.CourseNameAlias, t1.alignment_points, t1.Name, t1.status, vp.VAR_Alias, vp.ID vID 
+                            INTO #tempTable 
+                            from (select distinct l.ID as lID, g.ID as GEOID, ca.CourseNameAlias, l.Name, ca.alignment_points, va.VAR_Alias, va.ID as vID, a.status
+		                            from Learners l 
+		                            join VARs on VARs.ID = l.var_id
+	                                --join VARParents vp on vp.ID = VARs.var_parent_id
+                                    join Activities a on a.learner_id = l.ID
+                                    join Courses c on c.ID = a.course_id
+                                    join CourseAlias ca on ca.ID = c.alias_id
+	                                join GEOs g on g.ID = l.geo_id
+                                    join VARAlias va on va.ID = VARs.var_alias_id
+	                                where VAR_Alias like @VARFilter
+                                    AND a.status = 'Completed' AND l.userState = 'ACTIVE' AND l.Role like @roleFilter
+                                    AND alignment_points > 0 AND ca.kpi = 1  --sales courses only 
+	                                AND g.GEO like @geofilter AND VAR_Alias not like 'dassault%'  --ignore DS employees
+                                    AND va.status = 1) as T1 full outer join (select * from VARAlias where status = 1) as vp on T1.vID = vp.ID
+
+                            /* create temp table of all tech sales completions */
+                            select distinct l.ID as lID, g.ID as GEOID, ca.CourseNameAlias
+                                    , l.Name, ca.alignment_points
+	                                , va.VAR_Alias, va.ID as vID, a.status
+		                            INTO #tempTechTable from Learners l join VARs on VARs.ID = l.var_id	                                
+                                    join Activities a on a.learner_id = l.ID
+                                    join Courses c on c.ID = a.course_id
+                                    join CourseAlias ca on ca.ID = c.alias_id
+	                                join GEOs g on g.ID = l.geo_id
+                                    join VARAlias va on va.ID = VARs.var_alias_id
+	                                where VAR_Alias like @VARFilter AND a.status = 'Completed' AND l.userState = 'ACTIVE'
+		                            AND (l.Role like 'tech%sales' OR l.Role like 'tech%manag%')
+                                    AND alignment_points > 0 AND ca.kpi = 2  --tech sales courses only
+	                                AND g.GEO like @geofilter AND VAR_Alias not like 'dassault%'  --ignore DS employees
+                                    AND va.status = 1  --active VARs only
+
+	                            /* calculate bonus points for old CSSP completions */
+	                            declare @cFilter varchar(10) = '%css%', @cssp varchar(10) = '%CSSP%';
+	                            select COUNT(one.Name) * 40 as bonus, tt.vID
+	                            INTO #bonus from #tempTable tt
+	                            JOIN (select COUNT(t.Name) as cnt, t.Name, t.vID --, t.CourseNameAlias
+		                            FROM #tempTable t where t.CourseNameAlias like @cFilter --and t.Role = @roleFilter
+		                            group by t.Name, t.vID having COUNT(t.Name) = 1 ) as one on one.Name = tt.Name
+	                            where tt.CourseNameAlias like @cssp
+	                            group by tt.vID;
+
+	                            /* make FTE temp table */
+                                select sum(t1.ftesales) as fteVal, T1.VAR_Alias, T1.vaID as vID INTO #ftes
+                                from (select distinct vp.ID as vpID, FTESales, FTETech, VAR_Alias, var_alias_id as vaID from VARParents vp
+	                                join VARs v on v.var_parent_id = vp.id
+	                                join VARAlias va on va.id = v.var_alias_id
+	                                where va.status = 1) as T1
+	                                group by t1.VAR_Alias, t1.vaid
+	                            /* make tech FTE temp table */	
+                                select sum(t1.FTETech) as fteVal, T1.VAR_Alias, T1.vaID as vID INTO #techFTEs
+                                from (select distinct vp.ID as vpID, FTESales, FTETech, VAR_Alias, var_alias_id as vaID from VARParents vp
+	                                join VARs v on v.var_parent_id = vp.id
+	                                join VARAlias va on va.id = v.var_alias_id
+	                                where va.status = 1) as T1
+	                                group by t1.VAR_Alias, t1.vaid
+	                            /* create the report output from the temp tables */
+	                            select g.GEO, t.VAR_Alias as [VAR], f.fteVal as [FTE Value], ISNULL((SUM(t.alignment_points) + ISNULL(b.bonus, 0)), 0) as TotalAchievement
+	                                , CONVERT(DECIMAL(6,1),ISNULL((SUM(t.alignment_points) + ISNULL(b.bonus,0))/NULLIF(f.fteVal,0),0)) as WeightedAchievement
+	                                , ISNULL(tf.fteVal, 0) as [Tech FTEs], ISNULL(tt.alignment_points,0) as [TechTotalAchievement]
+	                                , CONVERT(decimal(6,1),ISNULL(tt.alignment_points/NULLIF(tf.fteVal,0), 0)) as [Tech Weighted Achievement]
+	                                from #tempTable t join GEOs g on t.GEOID = g.ID
+	                                full outer join #ftes f on f.vID = t.vID
+	                                left outer join #bonus b on b.vID = t.vID
+	                                left outer join #techFTEs tf on tf.vID = t.vID
+	                                /* need to sum the tech points before joining */
+	                                left outer join (select SUM(ttt.alignment_points) as [alignment_points], ttt.vID from #tempTechTable ttt group by ttt.vID) as tt on tt.vID = t.vID
+	                                where t.VAR_Alias is not null group by t.VAR_Alias, g.GEO, t.vID, f.fteVal, b.bonus, tf.fteVal, tt.alignment_points
+	                                ORDER BY g.GEO, t.VAR_Alias";
+            SqlCommand cmd = new SqlCommand(query, dbConn);
+            cmd.Parameters.AddWithValue("@varFilter", varFilter);
+            cmd.Parameters.AddWithValue("@roleFilter", roleFilter);
+            cmd.Parameters.AddWithValue("@geoFilter", geoFilter);
+            cmd.Parameters.AddWithValue("@salesGoal", SalesAlignmentGoal);
+            return TableQuery(cmd);
+
         }
 
         /// <summary>
