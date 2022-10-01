@@ -167,6 +167,7 @@ namespace SWUReporting
             db.Connect();
             DBReporting.db = db;
             Report r = new Report();
+            db.CreateTempTables();
             List<string> files = dbr.ReportMulipleVARs2(vars, out r);
             db.Disconnect();            
             FileDownloader.ZipAndDownload(files.ToArray());
@@ -304,6 +305,8 @@ namespace SWUReporting
             
             DB db = new DB("tmpVARDATA");  //initialize a temp table for transposed data
             db.Connect();
+            //create the base query table first
+            db.CreateTempTables();
             foreach (var row in geos)
             {
                 List<string> vars = new List<string>();
@@ -321,6 +324,7 @@ namespace SWUReporting
                 DBReporting.db = db;
                 Report r = new Report();
                 string folderName = "GEOs\\" + row.Key.ToUpper() + " CRE Certification Data";
+                
                 files.AddRange(dbr.ReportMulipleVARs2(vars, out r, folderName: folderName));                
             }
             db.Disconnect();

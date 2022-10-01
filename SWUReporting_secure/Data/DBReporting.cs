@@ -221,20 +221,8 @@ namespace ReportBuilder
         {
             Report r = new Report();
             List<string> files = new List<string>();
-            //first, create the temp table(s) to be used by all VAR queries to speed it up
-            try
-            {
-                db.CreateTransposedTempTable2(); //include everything
-            }
-            catch (Exception x)
-            {
 
-                throw;
-            }
             
-            db.CreateTransposedVTTempTable();  //technical cert table
-            if (!SharedTools.IsQ4()) { db.SetVARParentFTEValues(); }  //freeze FTE values in Q4
-            db.CreateAlignmentData(); //alignment data in a datatable
             foreach (string var in vars)
             {
                 varFilter = var;
@@ -315,7 +303,13 @@ namespace ReportBuilder
             ds.Tables.Add(dtTrans);
 
             //sheet 10 FTE and Alignment
+#if DEBUG
+            System.Diagnostics.Debug.Print("Attempting " + VARFilter);
+#endif
             DataTable dtA = db.getAlignmentReport2(varFilter: varFilter);
+#if DEBUG
+            System.Diagnostics.Debug.Print("Success.");
+#endif
             dtA.TableName = sheetNames[9];
             ds.Tables.Add(dtA);
 

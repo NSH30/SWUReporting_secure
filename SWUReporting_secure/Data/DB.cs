@@ -230,6 +230,22 @@ namespace ReportBuilder
             return TableQuery(cmd, query);
         }
 
+        internal void CreateTempTables()
+        {
+            try
+            {
+                CreateTransposedTempTable2(); //include everything
+            }
+            catch (Exception x)
+            {
+
+                throw;
+            }
+            CreateTransposedVTTempTable();  //technical cert table
+            if (!SharedTools.IsQ4()) { SetVARParentFTEValues(); }  //freeze FTE values in Q4
+            CreateAlignmentData(); //alignment data in a datatable
+        }
+
         /// <summary>
         /// Parameters already added to cmd
         /// </summary>
@@ -914,7 +930,7 @@ namespace ReportBuilder
         {
             string roleFilter = "[siv]%"; //only for sales calculations
             string query = @"--learner course completions into temp table
-                            SELECT t1.lID, T1.GEOID, t1.CourseNameAlias, t1.alignment_points, t1.Name, t1.status, vp.VAR_Alias, vp.ID vID 
+                            SELECT t1.lID, vp.geo_id as GEOID, t1.CourseNameAlias, ISNULL(t1.alignment_points,0) as  alignment_points, t1.Name, t1.status, vp.VAR_Alias, vp.ID vID 
                             INTO #tempTable 
                             from (select distinct l.ID as lID, g.ID as GEOID, ca.CourseNameAlias, l.Name, ca.alignment_points, va.VAR_Alias, va.ID as vID, a.status
 		                            from Learners l 
@@ -958,14 +974,14 @@ namespace ReportBuilder
 	                            group by tt.vID;
 
 	                            /* make FTE temp table */
-                                select sum(t1.ftesales) as fteVal, T1.VAR_Alias, T1.vaID as vID INTO #ftes
+                                select ISNULL(sum(t1.ftesales),0) as fteVal, T1.VAR_Alias, T1.vaID as vID INTO #ftes
                                 from (select distinct vp.ID as vpID, FTESales, FTETech, VAR_Alias, var_alias_id as vaID from VARParents vp
 	                                join VARs v on v.var_parent_id = vp.id
 	                                join VARAlias va on va.id = v.var_alias_id
 	                                where va.status = 1) as T1
 	                                group by t1.VAR_Alias, t1.vaid
 	                            /* make tech FTE temp table */	
-                                select sum(t1.FTETech) as fteVal, T1.VAR_Alias, T1.vaID as vID INTO #techFTEs
+                                select ISNULL(sum(t1.FTETech),0) as fteVal, T1.VAR_Alias, T1.vaID as vID INTO #techFTEs
                                 from (select distinct vp.ID as vpID, FTESales, FTETech, VAR_Alias, var_alias_id as vaID from VARParents vp
 	                                join VARs v on v.var_parent_id = vp.id
 	                                join VARAlias va on va.id = v.var_alias_id
@@ -979,9 +995,9 @@ namespace ReportBuilder
 	                                from #tempTable t join GEOs g on t.GEOID = g.ID
 	                                full outer join #ftes f on f.vID = t.vID
 	                                left outer join #bonus b on b.vID = t.vID
-	                                left outer join #techFTEs tf on tf.vID = t.vID
+	                                full outer join #techFTEs tf on tf.vID = t.vID
 	                                /* need to sum the tech points before joining */
-	                                left outer join (select SUM(ttt.alignment_points) as [alignment_points], ttt.vID from #tempTechTable ttt group by ttt.vID) as tt on tt.vID = t.vID
+	                                left outer join (select ISNULL(SUM(ttt.alignment_points),0) as [alignment_points], ttt.vID from #tempTechTable ttt group by ttt.vID) as tt on tt.vID = t.vID
 	                                where t.VAR_Alias is not null group by t.VAR_Alias, g.GEO, t.vID, f.fteVal, b.bonus, tf.fteVal, tt.alignment_points
 	                                ORDER BY g.GEO, t.VAR_Alias";
             SqlCommand cmd = new SqlCommand(query, dbConn);
