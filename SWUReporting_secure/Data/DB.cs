@@ -274,6 +274,7 @@ namespace ReportBuilder
             AlignmentData.Columns["TotalAchievement"].ColumnName = "TotalPoints";
             AlignmentData.Columns["WeightedAchievement"].ColumnName = "Weighted Achievement";
             AlignmentData.Columns["Tech FTEs"].ColumnName = "TechFTE";
+            AlignmentData.Columns["FTE Value"].ColumnName = "FTE";
             AlignmentData.Columns["TechTotalAchievement"].ColumnName = "TechTotalPoints";
             AlignmentData.Columns["Tech Weighted Achievement"].ColumnName = "TechWeightedAchievement";
             //AlignmentData.Columns["Tech Weighted Achievement"].ColumnName = "TechWeightedAchievement";
