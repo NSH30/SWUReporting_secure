@@ -245,10 +245,10 @@ namespace ReportBuilder
         }
 
         private DataTable ImportRemainingLearners(string tableName)
-        {            
+        {
             string query = @"select distinct ve.Name, ve.email, 'VT tech-sales' as Role, ve.Country, 'reseller' as profile, 'ACTIVE' as userState, 
 	                        vars.ID as var_id, GEOs.ID as geo_id, Countries.region_id as region_id, Countries.ID as country_id,  
-	                        0 as fte_value, ve.[Adobe Captivate id] as AdobeID
+	                        0 as fte_value, ve.[Adobe Captivate id] as AdobeID, null as [Contact ID]
 	                        from #TABLENAME# ve 
 	                        left outer join vars on vars.Name = ve.Company
 	                        left outer join GEOs on GEOs.GEO = ve.[User GEO]
@@ -256,10 +256,11 @@ namespace ReportBuilder
 	                        where ve.learners_id is null";
             query = query.Replace("#TABLENAME#", tableName);
             DataTable dt = DB.TableQuery(new SqlCommand(query, DB.dbConn), query);
-
-            string insertQuery = @"INSERT INTO Learners SELECT * FROM(" + query + ") as t1;";
-            DB.SimpleQuery(insertQuery);
-
+            if (dt.Rows.Count > 0)
+            { 
+                string insertQuery = @"INSERT INTO Learners SELECT * FROM(" + query + ") as t1;";
+                DB.SimpleQuery(insertQuery);
+            }
             return dt;
         }     
 
