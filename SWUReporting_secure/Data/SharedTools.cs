@@ -16,7 +16,7 @@ namespace SWUReporting
         public static bool IsQ4()
         {
             DateTime dt = DateTime.Today;
-            bool isQ4 = dt.Month > 9 ? false : true;
+            bool isQ4 = dt.Month > 9 ? true : false;
             return isQ4;
         }
     }
