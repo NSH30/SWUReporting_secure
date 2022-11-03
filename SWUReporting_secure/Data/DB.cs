@@ -851,37 +851,20 @@ namespace ReportBuilder
             string query = @"--learner course completions into temp table
                             SELECT t1.lID, vp.GEOID, t1.CourseNameAlias, t1.alignment_points, t1.Name, t1.status, vp.VAR_Parent, vp.ID vID 
                             INTO #tempTable 
-                            from (select distinct l.ID as lID, g.ID as GEOID, ca.CourseNameAlias, l.Name, ca.alignment_points, vp.VAR_Parent, vp.ID as vID, a.status
-		                            from Learners l 
-		                            join VARs on VARs.ID = l.var_id
-	                                join VARParents vp on vp.ID = VARs.var_parent_id
-                                    join Activities a on a.learner_id = l.ID
-                                    join Courses c on c.ID = a.course_id
-                                    join CourseAlias ca on ca.ID = c.alias_id
-	                                join GEOs g on g.ID = l.geo_id
-                                    join VARAlias va on va.ID = VARs.var_alias_id
-	                                where VAR_Parent like @VARFilter
-                                    AND a.status = 'Completed' AND l.userState = 'ACTIVE' AND l.Role like @roleFilter
-                                    AND alignment_points > 0 AND ca.kpi = 1  --sales courses only 
-	                                AND g.GEO like @geofilter AND VAR_Parent not like 'solidworks corp.'  --ignore DS employees
-                                    AND va.status = 1) as T1 full outer join ActiveVARParents vp on T1.vID = vp.ID
+                            from (select DISTINCT l.id as lID, l.GEO, CourseNameAlias, l.Name, alignment_points, a.status, VAR_Parent, l.vpID as vID
+                                from ActivitiesDetail a join AllActiveLearners l on l.id = a.learner_id
+                                where VAR_Parent like @VARFilter AND l.role like @rolefilter
+                                AND alignment_points > 0 AND kpi = 1  --sales courses only
+                                AND GEO like @geofilter) as T1 full outer join ActiveVARParents vp on T1.vID = vp.ID
 
                             /* create temp table of all tech sales completions */
-                            select distinct l.ID as lID, g.ID as GEOID, ca.CourseNameAlias
-                                    , l.Name, ca.alignment_points
-	                                , vp.VAR_Parent, vp.ID as vID, a.status
-		                            INTO #tempTechTable from Learners l join VARs on VARs.ID = l.var_id
-	                                join VARParents vp on vp.ID = VARs.var_parent_id
-                                    join Activities a on a.learner_id = l.ID
-                                    join Courses c on c.ID = a.course_id
-                                    join CourseAlias ca on ca.ID = c.alias_id
-	                                join GEOs g on g.ID = l.geo_id
-                                    join VARAlias on VARAlias.ID = VARs.var_alias_id
-	                                where VAR_Parent like @VARFilter AND a.status = 'Completed' AND l.userState = 'ACTIVE'
-		                            AND (l.Role like 'tech%sales' OR l.Role like 'tech%manag%')
-                                    AND alignment_points > 0 AND ca.kpi = 2  --tech sales courses only
-	                                AND g.GEO like @geofilter AND VAR_Parent not like 'solidworks corp.'  --ignore DS employees
-                                    AND VARAlias.status = 1  --active VARs only
+                            select DISTINCT l.id as lID, l.GEO, CourseNameAlias, l.Name, alignment_points, a.status, VAR_Parent, l.vpID as vID
+	                            INTO #tempTechTable
+                                from ActivitiesDetail a join AllActiveLearners l on l.id = a.learner_id
+                                where VAR_Parent like @VARFilter 
+	                            AND (l.Role like 'tech%sales' OR l.Role like 'tech%manag%')
+                                AND alignment_points > 0 AND kpi = 2  --tech sales courses only
+                                AND GEO like @geofilter
 
 	                            /* calculate bonus points for old CSSP completions */
 	                            declare @cFilter varchar(10) = '%css%', @cssp varchar(10) = '%CSSP%';
