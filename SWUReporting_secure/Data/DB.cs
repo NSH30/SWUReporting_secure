@@ -1712,62 +1712,73 @@ namespace ReportBuilder
         {
             DataTable table = new DataTable();
             //Sept. 7, 2021 - added CASE WHEN filter for 'Unenrolled' learners so they won't show as In Progress.
-            string query = @"DECLARE @cd nvarchar(max), @courses nvarchar(max), @coursesPTS nvarchar(max), @query1 nvarchar(max), @query2 nvarchar(max), @query3 nvarchar(max);
-                            set @coursesPTS = STUFF(
-	                            REPLACE(
-                                REPLACE((select Header from ((select ','+QUOTENAME([CourseNameAlias])+' As '+QUOTENAME(concat(CourseNameAlias, ' (', alignment_points, ' pts.)')) as Header, domain_id from CourseAlias where alignment_points > 0 and domain_id Is Not Null and domain_cert != 1)  -- added domain_cert filter 8/10/2021
-	                            UNION (select ','+QUOTENAME(CourseNameAlias) as Header, domain_id from CourseAlias where alignment_points = 0 and domain_id Is Not Null and domain_cert != 1)) as tbl order by domain_id, Header FOR XML PATH('')), '<Header>', '')  -- added domain_cert filter 8/10/2021
-	                            , '</Header>', '' )
-	                            , 1, 1, '');
-                            set @courses = STUFF(
-                                (SELECT DISTINCT ','+QUOTENAME([CourseNameAlias])
-                            FROM [CourseAlias] c WHERE c.domain_cert != 1 FOR XML PATH('')), 1, 1, '');  -- added domain_cert filter 8/10/2021
-                            --print @courses;
-                            --print @coursesPTS;
-							set @cd = 'CASE WHEN MAX(Activities.status) = ''Unenrolled'' THEN null  WHEN MAX(completionDate) is null THEN ''In Progress'' WHEN MAX(alignment_points) = 0 THEN ''Completed'' ELSE convert(varchar,MAX(alignment_points), 101) END as ''Completion Date'''; 
-							--print @cd;
-                            set @query1 = 'SELECT tblScore.ID, tblScore.Name,  email, Role, [FTE Value], [VAR Alias], company, Country, GEO, TotalAchievement, '+@coursesPTS+'
-                            FROM (select Learners.ID, Learners.Name, Learners.email, Learners.fte_value as [FTE Value], Learners.[Role], VARAlias.VAR_Alias as ''VAR Alias'', VARs.Name as ''company'', Learners.Country, GEOs.GEO, '+@cd+', CourseAlias.CourseNameAlias
-                            from Activities join Learners on Learners.ID = Activities.learner_id join VARs on VARs.ID = Learners.var_id
-                            join VARAlias on VARAlias.ID = VARs.var_alias_id join GEOs on GEOs.ID = Learners.geo_id left outer join Courses on Courses.ID = Activities.course_id
-                            left outer join CourseAlias on CourseAlias.ID = Courses.alias_id
-                            where (Activities.status != ''Not Started'' OR Courses.ID IS NULL ) AND Learners.userState = ''ACTIVE'' AND Learners.profile like '''+@profile+''' AND GEOs.GEO like '''+@geo+''' AND VARAlias.VAR_Alias like '''+@var+'''
-                            Group by Learners.ID, Learners.Name, Learners.email, Learners.fte_value, Learners.[Role], VARAlias.VAR_Alias, VARs.Name, Learners.Country, GEOs.GEO, CourseAlias.CourseNameAlias
-                            ) AS SourceTable PIVOT(MAX([Completion Date]) FOR [CourseNameAlias] IN('+@courses+')) AS PT '
-                            set @query2 = 'join (select SUM(alignment_points) as [TotalAchievement], ID, Name
-                            From (select aa.ID, aa.Name, aa.email, aa.Role, aa.[VAR Alias], aa.company, aa.Country, aa.GEO, aa.[Completion Date], aa.CourseNameAlias
-                            ,CASE WHEN aa.[Completion Date] = ''In Progress'' THEN 0 ELSE aa.alignment_points END AS [alignment_points] 
-                            from (select Learners.ID, Learners.Name, Learners.email, Learners.[Role], VARAlias.VAR_Alias as [VAR Alias], 
-                            VARs.Name as [company], Learners.Country, GEOs.GEO,  '+@cd+', 
-                            CourseAlias.CourseNameAlias
-							, CourseAlias.alignment_points
-                            from Activities join Learners on Learners.ID = Activities.learner_id join VARs on VARs.ID = Learners.var_id join VARAlias on VARAlias.ID = VARs.var_alias_id
-                            join GEOs on GEOs.ID = Learners.geo_id join Courses on Courses.ID = Activities.course_id join CourseAlias on CourseAlias.ID = Courses.alias_id
-                            where (Activities.status = ''In Progress'' OR Activities.status = ''Completed'') AND Learners.userState = ''ACTIVE'' AND Learners.profile like '''+@profile+''' 
-                            AND GEOs.GEO like '''+@geo+''' AND VARAlias.VAR_Alias like '''+@var+'''
-                            Group by Learners.ID, Learners.Name, Learners.email, Learners.[Role], VARAlias.VAR_Alias, VARs.Name, 
-                            Learners.Country, GEOs.GEO, CourseAlias.CourseNameAlias, CourseAlias.alignment_points) as aa) as tbl 
-                            Group By ID, Name) as tblScore on tblScore.ID = PT.ID'
-                            set @query3 = ' UNION ALL SELECT Learners.Name, Learners.email, Learners.Role, VAR_Alias as [VAR Alias], VARs.Name as [company], 
-	                        Learners.Country, GEOs.GEO,  0 as TotalAchievement, '''+@courses+'''
-	                        FROM Learners
-	                        join VARs on VARs.ID = Learners.var_id
-	                        join VARAlias on VARAlias.ID = VARs.var_alias_id
-	                        left outer join Activities on Activities.learner_id = Learners.ID
-	                        join GEOs on GEOs.ID = Learners.geo_id
-	                         where VARAlias.VAR_Alias like '''+@var+'''
-	                         AND Activities.ID is null'
-                            --print @query1
-                            --print @query2;
-                            execute (@query1+@query2)
-                            --execute (@query1+@query2+@query3)
-                            ;";
+            string query = @"Declare @roleFilter varchar(10) = '[siv]%', @kpi int;
+                    --create initial completions temp table
+                    select a.[order], a.domain_id, l.ID, l.Name, l.email, l.fte_value as [FTE Value], l.Role, l.VAR_Alias as [VAR Alias], l.company, l.Country, l.GEO, 
+                    CASE WHEN a.status = 'completed' THEN CONVERT(varchar, MAX(a.completionDate), 101) ELSE 'In Progress' END as [Completion Date], a.CourseNameAlias, a.alignment_points
+	                INTO #completions
+                    FROM ActivitiesDetail a RIGHT OUTER JOIN AllActiveLearners l on l.ID = a.learner_id
+                    --WHERE l.profile = 'reseller' AND l.GEO like @geoFilter AND l.VAR_Alias like @varFilter
+                    WHERE l.GEO like @geoFilter AND l.VAR_Alias like @varFilter  --removed reseller profile filter
+                    GROUP BY a.[order], a.domain_id, l.ID, l.Name, l.email, l.fte_value, l.Role, l.VAR_Alias, l.company, l.Country, l.GEO, a.CourseNameAlias, a.alignment_points, a.status
+
+                    --make a bonus temp table
+                    set @kpi = 1; --sales courses only
+                    select distinct a.CourseNameAlias, l.Name, l.ID, a.alignment_points, l.VAR_Alias, a.status, l.Role, a.kpi
+		                INTO #tempTable 
+		                from ActivitiesDetail a JOIN AllActiveLearners l on a.learner_id = l.ID
+                        where VAR_Alias like @varFilter AND l.Role like @roleFilter AND a.alignment_points > 0 AND a.domain_cert != 1 AND a.kpi = @kpi;						
+
+                    /* calculate bonus points for old CSSP completions */
+                    declare @cFilter varchar(10) = '%CSS%', @cssp varchar(10) = '%CSSP%';
+	                    select COUNT(t.Name) as cnt, t.Name, t.ID, 40 as [bonus] --, t.CourseNameAlias
+			                INTO #bonusTable 
+			                FROM #tempTable t 
+                            JOIN (/* count the number of name instances after filtering on CSS% */
+				                    select COUNT(tt.Name) as cnt, tt.Name --, t.CourseNameAlias
+				                    FROM #tempTable tt
+				                    where tt.CourseNameAlias like @cFilter and tt.Role like @roleFilter
+				                    group by tt.Name
+				                    having COUNT(tt.Name) = 1 ) as one on one.Name = t.Name
+                            where t.CourseNameAlias like @cssp AND t.Role like @roleFilter
+		                    group by t.Name, t.ID having COUNT(t.Name) = 1;
+
+                    --create the course lists
+                    Declare @coursesPTS varchar(max), @courses varchar(max);
+                    set @coursesPTS = STUFF(
+	                    REPLACE(
+                        REPLACE((select Header from ((select ','+QUOTENAME([CourseNameAlias])+' As '+QUOTENAME(concat(CourseNameAlias, ' (', alignment_points, ' pts.)')) as Header, domain_id from CourseAlias where alignment_points > 0 and domain_id Is Not Null and domain_cert != 1 and domain_id < 12)  -- added domain_cert filter 8/10/2021
+	                    UNION (select ','+QUOTENAME(CourseNameAlias) as Header, domain_id from CourseAlias where alignment_points = 0 and domain_id Is Not Null AND domain_id < 12 AND domain_id > 0 AND domain_cert != 1)) as tbl order by domain_id, Header FOR XML PATH('')), '<Header>', '')  -- added domain_cert filter 8/10/2021
+	                    , '</Header>', '' )
+	                    , 1, 1, '');
+                    set @courses = STUFF(
+                        (SELECT DISTINCT ','+QUOTENAME([CourseNameAlias])
+                    FROM [CourseAlias] c WHERE c.domain_cert != 1 AND c.domain_id < 12 AND c.domain_id > 0 FOR XML PATH('')), 1, 1, '');  -- added domain_cert filter 8/10/2021, filtering out SIMULIA Legacy 10/11/2021
+
+                    --Create the pivot
+                    Declare @query varchar(max);
+                    set @query = 'SELECT PT.ID, PT.Name,  email, Role, [FTE Value], [VAR Alias], company, Country, GEO, ISNULL(TotalAchievement,0) as TotalAchievement, ' + @coursesPTS + '
+                        FROM (SELECT ID, Name, email, [FTE Value], Role, [VAR Alias], company, Country, GEO, [alignment_points], CourseNameAlias FROM  #completions ) AS T1 
+	                    PIVOT(MAX([alignment_points]) FOR [CourseNameAlias] IN(' + @courses + ')) AS PT 
+	                    LEFT OUTER JOIN ( SELECT SUM(TotalAchievement + ISNULL(bonus,0)) as TotalAchievement, ta.ID, ta.Name FROM(
+			                    SELECT SUM ( CASE WHEN domain_id <> 9 and Role like ''[siv]%''
+			                    THEN alignment_points ELSE 0 END) +  --add the two values
+			                    SUM ( CASE WHEN domain_id = 9 and (Role like ''tech%sales'' OR Role like ''tech%manager%'')
+			                    THEN alignment_points ELSE 0 END) as TotalAchievement, tbl.ID, tbl.Name
+                                From (select c.[order], c.domain_id, c.ID, c.Name, c.email, c.[FTE Value], c.Role, c.[VAR Alias], c.company, c.Country, c.GEO, c.[Completion Date], c.coursenamealias
+			                    , CASE WHEN c.[Completion Date] = ''In Progress'' THEN 0 ELSE c.alignment_points END AS [alignment_points]
+			                    FROM #completions c) as tbl
+                                Group By tbl.ID, tbl.Name) AS ta 
+			                    LEFT OUTER JOIN #bonusTable bt on bt.ID = ta.ID Group By ta.ID, ta.Name
+			                    ) as tblScore on tblScore.ID = PT.ID';
+
+                   exec (@query);";
             //@query3 UNION doesn't work as-is. Would need to change each course column (@courses) to 'null = [columname]'
             using (var cmd = new SqlCommand(query, dbConn))
             {
-                cmd.Parameters.Add("@var", SqlDbType.VarChar).Value = varFilter;
-                cmd.Parameters.Add("@profile", SqlDbType.VarChar).Value = profileFilter;
-                cmd.Parameters.Add("@geo", SqlDbType.VarChar).Value = geoFilter;
+                cmd.Parameters.Add("@varFilter", SqlDbType.VarChar).Value = varFilter;
+                //cmd.Parameters.Add("@profile", SqlDbType.VarChar).Value = profileFilter;
+                cmd.Parameters.Add("@geoFilter", SqlDbType.VarChar).Value = geoFilter;
                 table = TableQuery(cmd, query);
             }
 
