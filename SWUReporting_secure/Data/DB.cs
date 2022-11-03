@@ -929,40 +929,25 @@ namespace ReportBuilder
         /// <returns></returns>
         internal DataTable getAlignmentByVAR(string varFilter, string geoFilter)
         {
+            //changed to simpler queries from views
+            //added DISTINCT filter in first completions query to avoid duplicates
             string roleFilter = "[siv]%"; //only for sales calculations
             string query = @"--learner course completions into temp table
-                            SELECT t1.lID, vp.geo_id as GEOID, t1.CourseNameAlias, ISNULL(t1.alignment_points,0) as  alignment_points, t1.Name, t1.status, vp.VAR_Alias, vp.ID vID 
+                            SELECT DISTINCT t1.lID, vp.geo_id as GEOID, t1.CourseNameAlias, ISNULL(t1.alignment_points,0) as  alignment_points, t1.Name, t1.status, vp.VAR_Alias, vp.ID vID 
                             INTO #tempTable 
-                            from (select distinct l.ID as lID, g.ID as GEOID, ca.CourseNameAlias, l.Name, ca.alignment_points, va.VAR_Alias, va.ID as vID, a.status
-		                            from Learners l 
-		                            join VARs on VARs.ID = l.var_id
-	                                --join VARParents vp on vp.ID = VARs.var_parent_id
-                                    join Activities a on a.learner_id = l.ID
-                                    join Courses c on c.ID = a.course_id
-                                    join CourseAlias ca on ca.ID = c.alias_id
-	                                join GEOs g on g.ID = l.geo_id
-                                    join VARAlias va on va.ID = VARs.var_alias_id
-	                                where VAR_Alias like @VARFilter
-                                    AND a.status = 'Completed' AND l.userState = 'ACTIVE' AND l.Role like @roleFilter
-                                    AND alignment_points > 0 AND ca.kpi = 1  --sales courses only 
-	                                AND g.GEO like @geofilter AND VAR_Alias not like 'dassault%'  --ignore DS employees
-                                    AND va.status = 1) as T1 full outer join (select * from VARAlias where status = 1) as vp on T1.vID = vp.ID
+                            from (select a.learner_id as lID, l.GEO, CourseNameAlias, l.Name, alignment_points, VAR_Alias, l.vaID as vID, a.status
+		                            from ActivitiesDetail a join AllActiveLearners l on l.id = a.learner_id 
+		                            where l.VAR_Alias like @varFilter and l.Role like @rolefilter and l.GEO like @geofilter
+		                            AND alignment_points > 0 AND kpi = 1  --sales courses only
+		                            ) as T1 full outer join (select * from VARAlias where status = 1) as vp on T1.vID = vp.ID
 
                             /* create temp table of all tech sales completions */
-                            select distinct l.ID as lID, g.ID as GEOID, ca.CourseNameAlias
-                                    , l.Name, ca.alignment_points
-	                                , va.VAR_Alias, va.ID as vID, a.status
-		                            INTO #tempTechTable from Learners l join VARs on VARs.ID = l.var_id	                                
-                                    join Activities a on a.learner_id = l.ID
-                                    join Courses c on c.ID = a.course_id
-                                    join CourseAlias ca on ca.ID = c.alias_id
-	                                join GEOs g on g.ID = l.geo_id
-                                    join VARAlias va on va.ID = VARs.var_alias_id
-	                                where VAR_Alias like @VARFilter AND a.status = 'Completed' AND l.userState = 'ACTIVE'
-		                            AND (l.Role like 'tech%sales' OR l.Role like 'tech%manag%')
-                                    AND alignment_points > 0 AND ca.kpi = 2  --tech sales courses only
-	                                AND g.GEO like @geofilter AND VAR_Alias not like 'dassault%'  --ignore DS employees
-                                    AND va.status = 1  --active VARs only
+                            select l.id as lID, GEO, CourseNameAlias, l.Name, alignment_points, VAR_Alias, l.vaID as vID, a.status
+	                            INTO #tempTechTable 
+	                            from ActivitiesDetail a join AllActiveLearners l on l.id = a.learner_id
+	                            where VAR_Alias like @varFilter and GEO like @geofilter
+	                            AND (l.Role like 'tech%sales' OR l.Role like 'tech%manag%')
+	                            AND alignment_points > 0 AND kpi = 2  --tech sales courses only
 
 	                            /* calculate bonus points for old CSSP completions */
 	                            declare @cFilter varchar(10) = '%css%', @cssp varchar(10) = '%CSSP%';
@@ -989,7 +974,7 @@ namespace ReportBuilder
 	                                where va.status = 1) as T1
 	                                group by t1.VAR_Alias, t1.vaid
 	                            /* create the report output from the temp tables */
-	                            select g.GEO, t.VAR_Alias as [VAR], f.fteVal as [FTE Value], ISNULL((SUM(t.alignment_points) + ISNULL(b.bonus, 0)), 0) as TotalAchievement
+	                            select g.GEO, t.VAR_Alias as [VAR], ISNULL(f.fteVal,0) as [FTE Value], ISNULL((SUM(t.alignment_points) + ISNULL(b.bonus, 0)), 0) as TotalAchievement
 	                                , CONVERT(DECIMAL(6,1),ISNULL((SUM(t.alignment_points) + ISNULL(b.bonus,0))/NULLIF(f.fteVal,0),0)) as WeightedAchievement
 	                                , ISNULL(tf.fteVal, 0) as [Tech FTEs], ISNULL(tt.alignment_points,0) as [TechTotalAchievement]
 	                                , CONVERT(decimal(6,1),ISNULL(tt.alignment_points/NULLIF(tf.fteVal,0), 0)) as [Tech Weighted Achievement]
