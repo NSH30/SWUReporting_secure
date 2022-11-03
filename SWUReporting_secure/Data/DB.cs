@@ -2667,8 +2667,9 @@ namespace ReportBuilder
 
         public List<string> getAdminUsers()
         {
-            string usersquery = "SELECT Trigram FROM dbo.Users WHERE [Admin] = 0";
+            string usersquery = "SELECT Trigram FROM dbo.Users WHERE [Admin] = 1";
             List<string> users = new List<string>();
+            var NewUsers = users.Select(item => item.Trim()).ToList();
             SqlCommand command = new SqlCommand(@usersquery, dbConn);
             using (SqlDataReader reader = command.ExecuteReader())
             {
@@ -2677,11 +2678,12 @@ namespace ReportBuilder
                     var trigrams = reader.GetString(0);
 
                     //hide menus from non-admins                                                                           
-                    users.Add(trigrams);
+                    NewUsers.Add(trigrams);
                 }
             }
-            return users;
+            return NewUsers;
         }
+
 
         
         #endregion
