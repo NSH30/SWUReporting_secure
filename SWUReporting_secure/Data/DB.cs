@@ -2549,6 +2549,20 @@ namespace ReportBuilder
             return TableQuery(cmd, query);
         }
 
+        public int GetCountryID(string country)
+        {
+            string query = "select ID from Countries WHERE Country = @country;";
+            using (var cmd = new SqlCommand(query, dbConn))
+            {
+                cmd.Parameters.AddWithValue("@country", country);
+                int count;               
+                var r = cmd.ExecuteScalar();
+                count = Convert.ToInt32(r);
+                return count;
+            }
+            
+        }
+
         //new version using FTE views
         public DataTable GetFTEVals6(string varFilter = "%", string geoFilter = "%",
             VARGrouping style = VARGrouping.byVARAlias)

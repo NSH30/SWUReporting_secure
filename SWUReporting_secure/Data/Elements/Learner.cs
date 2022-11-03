@@ -8,13 +8,26 @@ namespace ReportBuilder
 
     public class Learner
     {
+        #region fields
+        string country;
+        #endregion
         #region Properties
         public int ID { get; set; }
         public string Name { get; set; }
         public string email { get; set; }
         public Company company { get; set; }
         public string Region { get; set; }
-        public string Country { get; set; }
+        public string Country {
+            get
+            {
+                return country;
+            }
+            set
+            {
+                country = value;
+                country_id = db.GetCountryID(country);
+            }
+        }
         public string GEO { get; set; }
         public string userState { get; set; }
         public string Profile { get; set; }

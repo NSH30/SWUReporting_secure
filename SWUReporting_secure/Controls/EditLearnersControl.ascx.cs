@@ -243,7 +243,11 @@ namespace SWUReporting
             l.Name = tbName.Text;
             l.ID = learnerID;
             l.email = tbEmail.Text;
+
             l.Country = tbCountry.Text;
+
+            if (l.country_id == 0) { Messaging.SendAlert(string.Format("Unknown Country: {0}", l.Country), this.Page);}                
+            
             l.GEO = tbGEO.Text;
             l.fte_value = Convert.ToDouble(tbFTEVal.Text);
             //update with new geo
