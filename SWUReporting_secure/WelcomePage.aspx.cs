@@ -30,24 +30,19 @@ namespace SWUReporting
                 ////load the stats
                               
 
-                List<string> NewUsers = db.getAdminUsers();
+                List<string> Trigram = db.getAdminUsers();
 
                 //hide menus from non-admins 
-                if(NewUsers != null) { 
-                    foreach (var item in NewUsers)
-                    {
-                        item.Trim();
-                        string trigram = "DSONE\\" + item;
+                if(Trigram != null) { 
+                    foreach (var item in Trigram)
+                    {                        
+                        string NewUser = "DSONE\\" + item;
 
-                        if ( UserName == trigram)
+                        if ( UserName == NewUser)
                         {                            
                             Response.Redirect("Tools.aspx");
                             
-                        }
-                        else
-                        {
-                            Response.Write("<script>alert('Not authorized')</script>");
-                        }
+                        }                        
                     }                   
                 }
                 else
