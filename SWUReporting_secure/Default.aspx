@@ -144,14 +144,14 @@
         </div>
     </div>
     <br />
-    <%-- Sandrine's special learner report download: only visible to IQ1 and T35 --%>
-    <asp:Panel ID="Sandrine" runat="server" Visible="false">
+    <%-- special learner report download: transposed report with points instead of dates --%>
+    <asp:Panel ID="userPoints" runat="server">
         <div  class="container p-5 shadow" style="background-color:whitesmoke">
             <div>
                 <h4>Download Learner Progress Report</h4>
-                <p>Alignment points instead of completion dates</p>
+                <p>This report shows alignment points instead of completion dates and can be used to check user scores</p>
                 <asp:DropDownList ID="ddGEOs3" CssClass="form-control form-inline" runat="server" style="width:auto" AutoPostBack="true"></asp:DropDownList>
-                <p><asp:Button ID="btnLearnerProgress" Text="Learner Progress Report" CssClass="btn btn-primary" runat="server" OnClick="btnLearnerProgress_Click" />            
+                <br /><p><asp:Button ID="btnLearnerProgress" Text="Learner Progress Report" CssClass="btn btn-primary" runat="server" OnClick="btnLearnerProgress_Click" />            
                 </p>
             </div>
         </div>

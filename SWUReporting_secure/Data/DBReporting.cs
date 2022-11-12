@@ -454,12 +454,11 @@ namespace ReportBuilder
             {
                 switch (Type)
                 {
-                    case ReportType.SandrineIndividualScoreCSV:
-                        csvData = GetSandrineReportCSV(geoFilter: GEOFilter);
+                    case ReportType.TransposedPointsCSV:
+                        csvData = GetTransposedPointsCSV(geoFilter: GEOFilter);
                         name = "PAP - User Status Report.csv";
                         break;
-                    case ReportType.VARDashboardExcel:
-                        throw new NotImplementedException();
+                    case ReportType.VARDashboardExcel:                        
                         break;
                     default:
                         break;
@@ -1376,9 +1375,9 @@ namespace ReportBuilder
             return csvOutput;
         }
 
-        public static string GetSandrineReportCSV(string geoFilter = "%")
+        public static string GetTransposedPointsCSV(string geoFilter = "%")
         {
-            DataTable t = db.GetTransposedReportSandrine(geoFilter: geoFilter);
+            DataTable t = db.GetTransposedReportByPoints(geoFilter: geoFilter);
             string csvOut = ReportIO.getCSVFromTable(t);
             return csvOut;
         }

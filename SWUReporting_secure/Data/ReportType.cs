@@ -7,7 +7,7 @@ namespace SWUReporting
 {
     public enum ReportType
     {
-        SandrineIndividualScoreCSV,
+        TransposedPointsCSV,
         VARDashboardExcel
     }
 }

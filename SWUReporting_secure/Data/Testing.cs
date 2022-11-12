@@ -39,7 +39,7 @@ namespace ReportBuilder
         public static void PAP(DBReporting dbr, System.Web.UI.Page page)
         {
             bool status;
-            string serverFile = dbr.CreatePAPUserReport(ReportType.SandrineIndividualScoreCSV, out status);
+            string serverFile = dbr.CreatePAPUserReport(ReportType.TransposedPointsCSV, out status);
             //dbr.GetTransposedDataAllFTEs("goengineer");
             DBReporting.db.Disconnect();
 

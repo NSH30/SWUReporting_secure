@@ -1708,7 +1708,7 @@ namespace ReportBuilder
         /// <param name="profileFilter"></param>
         /// <param name="geoFilter"></param>
         /// <returns></returns>
-        public DataTable GetTransposedReportSandrine(string varFilter = "%", string profileFilter = "%", string geoFilter = "%")
+        public DataTable GetTransposedReportByPoints(string varFilter = "%", string profileFilter = "%", string geoFilter = "%")
         {
             DataTable table = new DataTable();
             //Sept. 7, 2021 - added CASE WHEN filter for 'Unenrolled' learners so they won't show as In Progress.

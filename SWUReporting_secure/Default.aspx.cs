@@ -59,12 +59,16 @@ namespace SWUReporting
 
                 tbSearchEndDate.Text = DateTime.Now.ToString("yyyy-MM-dd");
 
-                //set visibility of Sandrine learner progress report
-                List<string> validUsers = new List<string>(new string[] { "DSONE\\T35", "DSONE\\IQ1" });
-                if (validUsers.Contains(System.Web.HttpContext.Current.User.Identity.Name, StringComparer.OrdinalIgnoreCase))
-                    Sandrine.Visible = true;
-                else
-                    Sandrine.Visible = false;
+                ////set visibility of Sandrine learner progress report
+                //List<string> validUsers = new List<string>(new string[] { "DSONE\\T35", "DSONE\\IQ1" });
+                //if (validUsers.Contains(System.Web.HttpContext.Current.User.Identity.Name, StringComparer.OrdinalIgnoreCase))
+                //    userPoints.Visible = true;
+                //else
+                //    userPoints.Visible = false;
+
+                //make points report available to all Nov 12, 2022, Mike
+                //removed visible=false flag from the panel
+                
             }
             
         }
@@ -345,7 +349,7 @@ namespace SWUReporting
                 dbr.GEOFilter = "%";
 
             bool status;
-            string serverFile = dbr.CreatePAPUserReport(ReportType.SandrineIndividualScoreCSV, out status);
+            string serverFile = dbr.CreatePAPUserReport(ReportType.TransposedPointsCSV, out status);
             DBReporting.db.Disconnect();
 
             if (status)
