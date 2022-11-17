@@ -26,15 +26,13 @@
                 <tr>  
                     <td>Admin</td>  
                     <td>  
-                        <asp:RadioButtonList ID="Admin_radio" runat="server">  
-                            <asp:ListItem>Yes</asp:ListItem>  
-                            <asp:ListItem>No</asp:ListItem>  
-                        </asp:RadioButtonList>  
+                       <asp:RadioButton ID="rbYes" Text="Yes" runat="server"/>
+                       <asp:RadioButton ID="rbNo" Text="No" runat="server"/> 
                     </td>  
                </tr>  
                 <tr>                    
                     <td>  
-                        <asp:Button ID="Submit" runat="server" Text="Submit" />  
+                        <asp:Button ID="Submit" runat="server" Text="Submit" Onclick="Btn_Submit" />  
                     </td>  
                 </tr>  
             </table>  

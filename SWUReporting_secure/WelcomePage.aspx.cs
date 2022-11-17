@@ -22,36 +22,43 @@ namespace SWUReporting
 
         protected void Enter_click(object sender, EventArgs e)
         {
+            AuthenticateUser.AuthUser.Value = 
+            if(AuthenticateUser).Value!= null )
+            {
+
+            }
+
+        }
+        public bool  AuthenticateUser(String user)
+        {
             DB db = new DB();
             db.Connect();
             String UserName = System.Web.HttpContext.Current.User.Identity.Name;
-           
+            String AuthUser = string.Empty;
 
-                ////load the stats
-                              
 
-                List<string> Trigram = db.getAdminUsers();
+            ////load the stats
 
-                //hide menus from non-admins 
-                if(Trigram != null) { 
-                    foreach (var item in Trigram)
-                    {                        
-                        string NewUser = "DSONE\\" + item;
 
-                        if ( UserName == NewUser)
-                        {                            
-                            Response.Redirect("Tools.aspx");
-                            
-                        }                        
-                    }                   
-                }
-                else
+            List<string> Trigram = db.getAdminUsers();
+
+            //hide menus from non-admins                        
+                foreach (var item in Trigram)
                 {
-                    Response.Write("<script>alert('User Not Found')</script>");
+                    //item = item.Trim();
+
+                    string NewUser = "DSONE\\" + item.Trim();
+
+                    if (UserName == NewUser)
+                    {
+
+
+                        return true;
+                    }       
+                    
                 }
             
         }
-           
-        
+
     }
 }

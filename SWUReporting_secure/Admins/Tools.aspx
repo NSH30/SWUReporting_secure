@@ -77,6 +77,27 @@
         </div>
     </asp:Panel>
 
+    <cc1:ModalPopupExtender ID="ModalPopupExtender3" BehaviorID="mpe3" runat="server" PopupControlID="Panelusers" TargetControlID="editUsers" BackgroundCssClass="modalBackground" CancelControlID="btnCloseUsers" />
+    <asp:Panel ID="PanelUsers" runat="server" CssClass="modal-dialog" Style="display: none;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Add/Edit Users</h3>
+                </div>
+                <div class="modal-body">
+                    <p>First Name: &nbsp &nbsp &nbsp <asp:TextBox ID="UserFname" CssClass="form-control " Width="250px" runat="server" Rows="1"></asp:TextBox></p>
+                    <p>Last Name: &nbsp &nbsp &nbsp <asp:TextBox ID="UserLname" CssClass="form-control " Width="250px" runat="server" Rows="1"></asp:TextBox></p>
+                    <p>Trigram: &nbsp &nbsp &nbsp <asp:TextBox ID="UserTrigram" CssClass="form-control " Width="250px" runat="server" Rows="1"></asp:TextBox></p>
+                    </p>
+                    <asp:Button ID="Button1" runat="server" Text="Check Email" CssClass="modal-close btn" OnClick="btnCheck_Click" Visible="False" />
+                </div>
+                <div class="modal-footer">
+                    <asp:Button ID="Button2" runat="server" Text="Update" CssClass="btn btn-primary" OnClick="btnUpdateCourse_Click" />
+                    <asp:Button ID="Button3" runat="server" Text="Close" CssClass="modal-close btn" OnClick="btnCloseCourse_Click" />                    
+                </div>                
+            </div>
+        </div>
+    </asp:Panel>
 
     <cc1:ModalPopupExtender ID="ModalPopupExtender1" BehaviorID="mpe2" runat="server" PopupControlID="pnlEmails" TargetControlID="lnkDummy" BackgroundCssClass="modalBackground" CancelControlID="btnClose"/>
     <asp:Panel ID="pnlEmails" runat="server" CssClass="modal-dialog" style="display:none;"> <!-- was CssClass "panel" -->

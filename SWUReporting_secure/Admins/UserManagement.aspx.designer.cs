@@ -40,13 +40,22 @@ namespace SWUReporting {
         protected global::System.Web.UI.WebControls.TextBox Trig_text;
         
         /// <summary>
-        /// Admin_radio control.
+        /// rbYes control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RadioButtonList Admin_radio;
+        protected global::System.Web.UI.WebControls.RadioButton rbYes;
+        
+        /// <summary>
+        /// rbNo control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButton rbNo;
         
         /// <summary>
         /// Submit control.

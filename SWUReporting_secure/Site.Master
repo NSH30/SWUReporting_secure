@@ -59,11 +59,11 @@
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
-                                <li id="learners" runat="server"><a href="Learners.aspx">Learners</a></li>
-                                <li id="companies" runat="server"><a href="EditCompanies.aspx">Companies</a></li>
-                                <li id="courses" runat="server"><a href="EditCourses.aspx">Courses</a></li>
-                                <li id="alignment" runat="server"><a href="Alignment.aspx">Course Targets</a></li>
-                                <li id="targets" runat="server"><a href="EditCustomTargets.aspx">Company Targets</a></li>
+                                <li id="learners" runat="server"><a href="Admins/Users/Learners.aspx">Learners</a></li>
+                                <li id="companies" runat="server"><a href="Admins/EditCompanies.aspx">Companies</a></li>
+                                <li id="courses" runat="server"><a href="Admins/EditCourses.aspx">Courses</a></li>
+                                <li id="alignment" runat="server"><a href="Admins/Alignment.aspx">Course Targets</a></li>
+                                <li id="targets" runat="server"><a href="Admins/EditCustomTargets.aspx">Company Targets</a></li>
                             </ul>
                         </li>
                         <li id="admin" class="dropdown" runat="server">
@@ -71,8 +71,8 @@
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a href="Import.aspx">Import</a></li>
-                                <li><a href="Tools.aspx">Batch Edit</a></li>                                
+                                <li><a href="Admins/Import.aspx">Import</a></li>
+                                <li><a href="Admins/Tools.aspx">Tools</a></li>                                
                             </ul>
                         </li>
                     </ul>

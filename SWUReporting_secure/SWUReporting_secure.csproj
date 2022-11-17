@@ -124,7 +124,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="About.aspx" />
-    <Content Include="Alignment.aspx" />
+    <Content Include="Admins\Alignment.aspx" />
     <Content Include="Contact.aspx" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
@@ -132,12 +132,12 @@
     <Content Include="Content\Margins.css" />
     <Content Include="Content\Site.css" />
     <Content Include="Controls\EditAliasControl.ascx" />
-    <Content Include="EditCompanies.aspx" />
+    <Content Include="Admins\EditCompanies.aspx" />
     <Content Include="Controls\EditCompanyControl.ascx" />
     <Content Include="Controls\EditCourseAliasControl.ascx" />
     <Content Include="Controls\EditCourseControl.ascx" />
-    <Content Include="EditCourses.aspx" />
-    <Content Include="EditCustomTargets.aspx" />
+    <Content Include="Admins\EditCourses.aspx" />
+    <Content Include="Admins\EditCustomTargets.aspx" />
     <Content Include="Controls\EditLearnersControl.ascx" />
     <Content Include="Error.aspx" />
     <Content Include="favicon.ico" />
@@ -147,13 +147,13 @@
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Contenttest.aspx" />
     <Content Include="WelcomePage.aspx" />
-    <Content Include="UserManagement.aspx" />
+    <Content Include="Admins\UserManagement.aspx" />
     <None Include="Properties\PublishProfiles\ag-swuniversity.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Images\Fadingballs.gif" />
     <Content Include="Images\SWULogo.png" />
-    <Content Include="Import.aspx" />
-    <Content Include="Learners.aspx" />
+    <Content Include="Admins\Import.aspx" />
+    <Content Include="Admins\Users\Learners.aspx" />
     <Content Include="Controls\Loading.ascx" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -187,9 +187,9 @@
     <Content Include="Default.aspx" />
     <Content Include="Global.asax" />
     <Content Include="Site.Master" />
-    <Content Include="Tools.aspx" />
+    <Content Include="Admins\Tools.aspx" />
     <Content Include="Controls\TransposedReport.ascx" />
-    <Content Include="ViewActivities.aspx" />
+    <Content Include="Admins\ViewActivities.aspx" />
     <Content Include="Controls\ViewActivitiesControl.ascx" />
     <Content Include="Controls\ViewSwitcher.ascx" />
     <Content Include="Web.config">
@@ -208,11 +208,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Alignment.aspx.cs">
+    <Compile Include="Admins\Alignment.aspx.cs">
       <DependentUpon>Alignment.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Alignment.aspx.designer.cs">
+    <Compile Include="Admins\Alignment.aspx.designer.cs">
       <DependentUpon>Alignment.aspx</DependentUpon>
     </Compile>
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -270,11 +270,11 @@
     <Compile Include="Controls\EditAliasControl.ascx.designer.cs">
       <DependentUpon>EditAliasControl.ascx</DependentUpon>
     </Compile>
-    <Compile Include="EditCompanies.aspx.cs">
+    <Compile Include="Admins\EditCompanies.aspx.cs">
       <DependentUpon>EditCompanies.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="EditCompanies.aspx.designer.cs">
+    <Compile Include="Admins\EditCompanies.aspx.designer.cs">
       <DependentUpon>EditCompanies.aspx</DependentUpon>
     </Compile>
     <Compile Include="Controls\EditCompanyControl.ascx.cs">
@@ -298,18 +298,18 @@
     <Compile Include="Controls\EditCourseControl.ascx.designer.cs">
       <DependentUpon>EditCourseControl.ascx</DependentUpon>
     </Compile>
-    <Compile Include="EditCourses.aspx.cs">
+    <Compile Include="Admins\EditCourses.aspx.cs">
       <DependentUpon>EditCourses.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="EditCourses.aspx.designer.cs">
+    <Compile Include="Admins\EditCourses.aspx.designer.cs">
       <DependentUpon>EditCourses.aspx</DependentUpon>
     </Compile>
-    <Compile Include="EditCustomTargets.aspx.cs">
+    <Compile Include="Admins\EditCustomTargets.aspx.cs">
       <DependentUpon>EditCustomTargets.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="EditCustomTargets.aspx.designer.cs">
+    <Compile Include="Admins\EditCustomTargets.aspx.designer.cs">
       <DependentUpon>EditCustomTargets.aspx</DependentUpon>
     </Compile>
     <Compile Include="Controls\EditLearnersControl.ascx.cs">
@@ -329,18 +329,18 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Import.aspx.cs">
+    <Compile Include="Admins\Import.aspx.cs">
       <DependentUpon>Import.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Import.aspx.designer.cs">
+    <Compile Include="Admins\Import.aspx.designer.cs">
       <DependentUpon>Import.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Learners.aspx.cs">
+    <Compile Include="Admins\Users\Learners.aspx.cs">
       <DependentUpon>Learners.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Learners.aspx.designer.cs">
+    <Compile Include="Admins\Users\Learners.aspx.designer.cs">
       <DependentUpon>Learners.aspx</DependentUpon>
     </Compile>
     <Compile Include="Controls\Loading.ascx.cs">
@@ -366,11 +366,11 @@
     <Compile Include="Site.Mobile.Master.designer.cs">
       <DependentUpon>Site.Mobile.Master</DependentUpon>
     </Compile>
-    <Compile Include="Tools.aspx.cs">
+    <Compile Include="Admins\Tools.aspx.cs">
       <DependentUpon>Tools.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Tools.aspx.designer.cs">
+    <Compile Include="Admins\Tools.aspx.designer.cs">
       <DependentUpon>Tools.aspx</DependentUpon>
     </Compile>
     <Compile Include="Controls\TransposedReport.ascx.cs">
@@ -380,11 +380,11 @@
     <Compile Include="Controls\TransposedReport.ascx.designer.cs">
       <DependentUpon>TransposedReport.ascx</DependentUpon>
     </Compile>
-    <Compile Include="ViewActivities.aspx.cs">
+    <Compile Include="Admins\ViewActivities.aspx.cs">
       <DependentUpon>ViewActivities.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="ViewActivities.aspx.designer.cs">
+    <Compile Include="Admins\ViewActivities.aspx.designer.cs">
       <DependentUpon>ViewActivities.aspx</DependentUpon>
     </Compile>
     <Compile Include="Controls\ViewActivitiesControl.ascx.cs">
@@ -415,11 +415,11 @@
     <Compile Include="WelcomePage.aspx.designer.cs">
       <DependentUpon>WelcomePage.aspx</DependentUpon>
     </Compile>
-    <Compile Include="UserManagement.aspx.cs">
+    <Compile Include="Admins\UserManagement.aspx.cs">
       <DependentUpon>UserManagement.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="UserManagement.aspx.designer.cs">
+    <Compile Include="Admins\UserManagement.aspx.designer.cs">
       <DependentUpon>UserManagement.aspx</DependentUpon>
     </Compile>
   </ItemGroup>
