@@ -20,16 +20,16 @@ namespace SWUReporting
 
         }
 
-        protected void Enter_click(object sender, EventArgs e)
-        {
-            AuthenticateUser.AuthUser.Value = 
-            if(AuthenticateUser).Value!= null )
-            {
+        //protected void Enter_click(object sender, EventArgs e)
+        //{
+        //    AuthenticateUser.AuthUser.Value = 
+        //    if(AuthenticateUser).Value!= null )
+        //    {
 
-            }
+        //    }
 
-        }
-        public bool  AuthenticateUser(String user)
+        //}
+        public void Enter_click(object sender, EventArgs e)
         {
             DB db = new DB();
             db.Connect();
@@ -43,21 +43,20 @@ namespace SWUReporting
             List<string> Trigram = db.getAdminUsers();
 
             //hide menus from non-admins                        
-                foreach (var item in Trigram)
+            foreach (var item in Trigram)
+            {
+                //item = item.Trim();
+
+                string NewUser = "DSONE\\" + item.Trim();
+
+                if (UserName == NewUser)
                 {
-                    //item = item.Trim();
 
-                    string NewUser = "DSONE\\" + item.Trim();
-
-                    if (UserName == NewUser)
-                    {
-
-
-                        return true;
-                    }       
-                    
+                    Response.Redirect("~/Admins/Tools.aspx");
                 }
-            
+
+            }
+
         }
 
     }

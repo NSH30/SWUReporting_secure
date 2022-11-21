@@ -67,6 +67,24 @@ namespace SWUReporting {
         protected global::System.Web.UI.WebControls.TextBox tbMessage;
         
         /// <summary>
+        /// AddUsers control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button AddUsers;
+        
+        /// <summary>
+        /// add_editUser control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button add_editUser;
+        
+        /// <summary>
         /// ModalPopupExtender2 control.
         /// </summary>
         /// <remarks>
@@ -184,31 +202,22 @@ namespace SWUReporting {
         protected global::System.Web.UI.WebControls.TextBox UserTrigram;
         
         /// <summary>
-        /// Button1 control.
+        /// btnAddUsers control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button Button1;
+        protected global::System.Web.UI.WebControls.Button btnAddUsers;
         
         /// <summary>
-        /// Button2 control.
+        /// btnEditUsers control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button Button2;
-        
-        /// <summary>
-        /// Button3 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button Button3;
+        protected global::System.Web.UI.WebControls.Button btnEditUsers;
         
         /// <summary>
         /// ModalPopupExtender1 control.

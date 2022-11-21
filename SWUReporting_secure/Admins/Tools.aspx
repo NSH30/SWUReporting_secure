@@ -37,7 +37,24 @@
             <asp:TextBox ID="tbMessage" runat="server" BorderStyle="None" TextMode="MultiLine" Rows="10" Visible="False" Width="100%"></asp:TextBox>
         </div>     
     </div>
+    <br/>
+    <br/>
 
+    <!--Add/Edit Users -->
+    <div class="form-inline">
+        <asp:Button ID="AddUsers" runat="server" style="display:none" />
+    </div>
+        <div class="container p-5 shadow" style="background-color:whitesmoke">
+        <div>
+            <h4>Add/Edit Users</h4>
+            <p>Manually add or Edit user access for admin or non-admin privileges</p>
+        </div>
+        <div >
+            <br />
+            <asp:Button ID="add_editUser" Text="Add Users" CssClass="btn btn-primary" runat="server" OnClick="btnAdd_EditUsers_Click"/>            
+        </div>  
+        <br />             
+    </div>
 <%--    <div class="container p-5 shadow" style="background-color:whitesmoke">
         <div>
             <h4>Download Raw Learner Data</h4>
@@ -77,7 +94,8 @@
         </div>
     </asp:Panel>
 
-    <cc1:ModalPopupExtender ID="ModalPopupExtender3" BehaviorID="mpe3" runat="server" PopupControlID="Panelusers" TargetControlID="editUsers" BackgroundCssClass="modalBackground" CancelControlID="btnCloseUsers" />
+    <!--Add/Edit Users -->
+    <cc1:ModalPopupExtender ID="ModalPopupExtender3" BehaviorID="mpe3" runat="server" PopupControlID="Panelusers" TargetControlID="AddUsers" BackgroundCssClass="modalBackground" CancelControlID="btnCloseUsers" />
     <asp:Panel ID="PanelUsers" runat="server" CssClass="modal-dialog" Style="display: none;">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -87,18 +105,17 @@
                 <div class="modal-body">
                     <p>First Name: &nbsp &nbsp &nbsp <asp:TextBox ID="UserFname" CssClass="form-control " Width="250px" runat="server" Rows="1"></asp:TextBox></p>
                     <p>Last Name: &nbsp &nbsp &nbsp <asp:TextBox ID="UserLname" CssClass="form-control " Width="250px" runat="server" Rows="1"></asp:TextBox></p>
-                    <p>Trigram: &nbsp &nbsp &nbsp <asp:TextBox ID="UserTrigram" CssClass="form-control " Width="250px" runat="server" Rows="1"></asp:TextBox></p>
-                    </p>
-                    <asp:Button ID="Button1" runat="server" Text="Check Email" CssClass="modal-close btn" OnClick="btnCheck_Click" Visible="False" />
+                    <p>Trigram: &nbsp &nbsp &nbsp <asp:TextBox ID="UserTrigram" CssClass="form-control " Width="250px" runat="server" Rows="1"></asp:TextBox></p>                                        
                 </div>
                 <div class="modal-footer">
-                    <asp:Button ID="Button2" runat="server" Text="Update" CssClass="btn btn-primary" OnClick="btnUpdateCourse_Click" />
-                    <asp:Button ID="Button3" runat="server" Text="Close" CssClass="modal-close btn" OnClick="btnCloseCourse_Click" />                    
+                    <asp:Button ID="btnAddUsers" runat="server" Text="Add Users" CssClass="modal-close btn" Onclick="btnAddUsers_click"/>
+                    <asp:Button ID="btnEditUsers" runat="server" Text="Edit Users" CssClass="modal-close btn" Onclick="btnEditUsers_click"/>                    
                 </div>                
             </div>
         </div>
     </asp:Panel>
 
+    <!--Delete Learners --->
     <cc1:ModalPopupExtender ID="ModalPopupExtender1" BehaviorID="mpe2" runat="server" PopupControlID="pnlEmails" TargetControlID="lnkDummy" BackgroundCssClass="modalBackground" CancelControlID="btnClose"/>
     <asp:Panel ID="pnlEmails" runat="server" CssClass="modal-dialog" style="display:none;"> <!-- was CssClass "panel" -->
     <div class="modal-dialog" role="document">

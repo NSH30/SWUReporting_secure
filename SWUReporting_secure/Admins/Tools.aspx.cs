@@ -137,7 +137,7 @@ namespace SWUReporting
                 return;
             }
             DateTime CourseDate = DateTime.Parse(tbDate.Text);
-            String CourseName = tbName.Text;
+            String CourseName = tbName.Text;    
 
             List<string> emails = new List<string>(
                 emailVal.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries));
@@ -155,5 +155,22 @@ namespace SWUReporting
         {
 
         }
+
+        protected void btnAddUsers_click(object sender, EventArgs e)
+        {
+
+
+        }
+
+        protected void btnEditUsers_click(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void btnAdd_EditUsers_Click(object sender, EventArgs e)
+        {
+            ModalPopupExtender3.Show();
+        }
     }
+
 }

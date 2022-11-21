@@ -46,7 +46,7 @@ namespace SWUReporting
                 {                                
                           if (("DSONE\\" + items).Contains(System.Web.HttpContext.Current.User.Identity.Name))
                           {                                    
-                              HideMenus();
+                              //HideMenus();
                                     //show the edit learners page?                                    
                           }
                 }
