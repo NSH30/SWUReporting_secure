@@ -122,8 +122,9 @@ namespace SWUReporting
             //cfEditUsers.learnerID = learnerID;
             fillForm();
             refreshSearch = true;
-            //continue adding user data            
-            ModalPopupExtender1.Show();
+            //continue adding user data   
+            Title.Text = @"<h3>Edit Learner</h3>";
+               ModalPopupExtender1.Show();
         }
 
         protected void lnkEditBlanks_Click(object sender, EventArgs e)
@@ -136,41 +137,56 @@ namespace SWUReporting
             ModalPopupExtender1.Show();
         }
 
-        protected void fillForm()
+        protected void fillForm(bool isNew = false)
         {
             //query the learner data from the ID
             DB db = new DB();
             db.Connect();
             Learner l = new Learner(db);
-            l.GetLearnerByID(learnerID);
-            db.Disconnect();
-
-            cbDelete.Checked = false;
-            //add learner details here
-            tbName.Text = l.Name;
-            tbEmail.Text = l.email;
-            if (l.company.Name == null)
+            if (!isNew)
             {
+                l.GetLearnerByID(learnerID);
+                db.Disconnect();
+                //add learner details here
+                tbName.Text = l.Name;
+                tbEmail.Text = l.email;
+                if (l.company.Name == null)
+                {
+                    tbCompany.Text = "";
+                }
+                else
+                {
+                    tbCompany.Text = l.company.Name;
+                }            
+                tbRole.Text = l.Role;
+                tbCountry.Text = l.Country;
+                tbProfile.Text = l.Profile;
+                tbUserState.Text = l.userState;
+                if (l.GEO == null)
+                {
+                    tbGEO.Text = "";
+                }
+                else
+                {
+                    tbGEO.Text = l.GEO;
+                }
+                tbFTEVal.Text = l.fte_value.ToString();
+            }
+            else  //clear all values for a new user
+            {
+                tbName.Text = "";
+                tbEmail.Text = "";
                 tbCompany.Text = "";
-            }
-            else
-            {
-                tbCompany.Text = l.company.Name;
-            }            
-            tbRole.Text = l.Role;
-            tbCountry.Text = l.Country;
-            tbProfile.Text = l.Profile;
-            tbUserState.Text = l.userState;
-            if (l.GEO == null)
-            {
+                tbRole.Text = "";
+                tbCountry.Text = "";
+                tbProfile.Text = "";
+                tbUserState.Text = "";
                 tbGEO.Text = "";
+                tbFTEVal.Text = "";
             }
-            else
-            {
-                tbGEO.Text = l.GEO;
-            }
-            tbFTEVal.Text = l.fte_value.ToString();
-
+            
+            cbDelete.Checked = false;
+            
             //GEO selection for VAR report
             //load GEO filter list
             DataTable dt = new DataTable();            
@@ -182,7 +198,7 @@ namespace SWUReporting
             ddGEOs.DataValueField = "ID";  //connect this to ID for VAR Alias query
             ddGEOs.DataBind();
             ddGEOs.Items.Insert(0, new ListItem("Select GEO", "-1"));
-            if (l.GEO != null)
+            if (l.GEO != null)  //if there is a learner with a GEO value, select it in the list
             {
                 ddGEOs.Items.FindByText(l.GEO).Selected = true;
                 l.geo_id = Convert.ToInt32(ddGEOs.SelectedItem.Value);
@@ -198,41 +214,51 @@ namespace SWUReporting
             ddVARAlias.DataTextField = "VAR_Alias";
             ddVARAlias.DataBind();
             ddVARAlias.Items.Insert(0, new ListItem("Select the parent VAR name", "-1"));
-            if (l.company.AliasId == 0 || l.company.AliasId == null)
+            if (!isNew)  //set up other values if not a new learner
             {
-                //select var mapping
-                ddVARAlias.SelectedIndex = 0;
-                //emphasize it with red or yellow?
-                ddVARAlias.BackColor = System.Drawing.Color.LightYellow;
-                int i = 1;
-            }
-            else
-            {
-                //ddVARAlias.Items.FindByText(l.company.Name).Selected = true;
-                try
+                if (l.company.AliasId == 0 || l.company.AliasId == null)
                 {
-                    ddVARAlias.SelectedValue = l.company.AliasId.ToString();
-                    tbVARAlias.Text = ddVARAlias.SelectedItem.Text;
+                    //select var mapping
+                    ddVARAlias.SelectedIndex = 0;
+                    //emphasize it with red or yellow?
+                    ddVARAlias.BackColor = System.Drawing.Color.LightYellow;
+                    int i = 1;
                 }
-                catch (Exception)
+                else
                 {
-                    //For DS emlpoyees, their VAR Alias name won't show up in the GEO filtered list
-                    //so it is ignored by this try block        
-                    tbVARAlias.Text = "";  //when lookup fails, show as blank            
-                }
+                    //ddVARAlias.Items.FindByText(l.company.Name).Selected = true;
+                    try
+                    {
+                        ddVARAlias.SelectedValue = l.company.AliasId.ToString();
+                        tbVARAlias.Text = ddVARAlias.SelectedItem.Text;
+                    }
+                    catch (Exception)
+                    {
+                        //For DS emlpoyees, their VAR Alias name won't show up in the GEO filtered list
+                        //so it is ignored by this try block        
+                        tbVARAlias.Text = "";  //when lookup fails, show as blank            
+                    }
                 
-            }
+                }
 
-            if (l.userState == deletedState)
-            {
-                cbDelete.Text = "ACTIVATE Learner";
+                if (l.userState == deletedState)
+                {
+                    cbDelete.Text = "ACTIVATE Learner";
+                }
+                else
+                {
+                    cbDelete.Text = "DELETE Learner";
+                }
             }
-            else
-            {
-                cbDelete.Text = "DELETE Learner";
-            }
+            
         }
 
+
+        /// <summary>
+        /// Save the learner changes or a new learner from the modal
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void btnSave_Click(object sender, EventArgs e)
         {
             DB db = new DB();
@@ -256,8 +282,14 @@ namespace SWUReporting
                 l.geo_id = Convert.ToInt32(ddGEOs.SelectedItem.Value);
                 l.GEO = ddGEOs.SelectedItem.Text;
             }
-            
-            Company c = l.company;
+
+            //Company c = l.company is null ? new Company(db) : l.company;
+            Company c = new Company(db);
+            if (l.company != null)
+            {
+                c = l.company;
+            }
+
             bool updateCompany = false;
             if (!c.GetByName(tbCompany.Text))
             {
@@ -277,18 +309,25 @@ namespace SWUReporting
             {
                 l.userState = activeState;
             }
+            else if (!cbDelete.Checked && tbUserState.Text == "") { l.userState = activeState; }
             else
             {
                 l.userState = tbUserState.Text;
             }
             l.Role = tbRole.Text;
             l.Profile = tbProfile.Text;
-            
-            var msg = l.Update();
-            if (msg.StartsWith("ERROR:"))
+            var msg = "";
+
+            if (l.ID == 0) { l.Insert(); }
+            else
             {
-                Messaging.SendAlert(msg, Page);
+                msg = l.Update();
+                if (msg.StartsWith("ERROR:"))
+                {
+                    Messaging.SendAlert(msg, Page);
+                }
             }
+            
             //update the VAR Alias- dissabled May 11, 2022 - causing too many mapping errors.
             //if (Convert.ToInt32(ddVARAlias.SelectedItem.Value) > 0 && updateCompany)
             //{                
@@ -455,6 +494,17 @@ namespace SWUReporting
             db.Disconnect();
             //if successful
             Messaging.SendAlert("Learners merged.", Page);
+        }
+
+        protected void lnkAddLearner_Click(object sender, EventArgs e)
+        {
+            //learnerID = Convert.ToInt32((sender as LinkButton).CommandArgument);
+            //cfEditUsers.learnerID = learnerID;
+            fillForm(true); //fill with new user 
+            //refreshSearch = true;
+            //continue adding user data  
+            Title.Text = @"<h3>Add New Learner</h3>";
+            ModalPopupExtender1.Show();
         }
     }
 }

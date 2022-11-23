@@ -15,10 +15,12 @@
 <asp:Panel ID="pnlPopup" runat="server" CssClass="modal-dialog-centered modal-xl" style="display:block;" > <!-- was CssClass "panel" -->
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Edit Learner</h3>
+                <asp:Label ID="Title" runat="server"><h3>Edit Learner</h3></asp:Label>
+                <%--<h3>Edit Learner</h3>--%>
             </div>
             <div class="modal-body" style="max-height: 500px; overflow: auto;">   
-                *Please notify the <a href="mailto:solidworks.salescertification@3ds.com">SOLIDWORKS University team</a> about any changes to learner details so the changes can also be made in SOLIDWORKS University.<br /> &nbsp;<table class="table table-controls" style="vertical-align: middle; width: 100%;">
+                *Please notify the <a href="mailto:solidworks.salescertification@3ds.com">SOLIDWORKS University team</a> about any changes to learner details so the changes can also be made in SOLIDWORKS University.<br /> &nbsp;
+                <table class="table table-controls" style="vertical-align: middle; width: 100%;">
                     <tr>
                         <td>
                             <p>
@@ -93,17 +95,33 @@
                 </table>
             </div>
             <div class="modal-footer">                
-                <asp:Button ID="btnSave" runat="server" Text="Save Changes" CssClass="modal-close btn btn-primary" OnClick="btnSave_Click"/>                
+                <asp:Button ID="btnSave" runat="server" Text="Save" CssClass="modal-close btn btn-primary" OnClick="btnSave_Click"/>                
                 <asp:Button ID="btnClose" runat="server" Text="Close" CssClass="modal-close btn" OnClick="btnHide_Click" />
             </div>
         </div>
 </asp:Panel>
 
+<%--Always visible buttons--%>
 <div class="form-inline">
-    <asp:Button ID="btnMergeLearners" style="margin-bottom:10px" Text="Merge Learners" CssClass="btn btn-primary tooltips" runat="server" Enabled="false" OnClick="btnMergeLearners_Click" data-placement="right" title="Before merging two users, edit them to match all field values." />
-    <asp:LinkButton ID="lnkSaveExcel" CssClass="btn btn-primary" runat="server" OnClick="lnkSaveExcel_Click" style="margin-bottom:10px" ToolTip="Download">
-        <span aria-hidden="true" class="glyphicon glyphicon-download-alt"></span>
-    </asp:LinkButton>
+    <table style="width: 100%;"> <%--Not sure if this is the right way to style--%>
+        <tr>
+            <td>  <%--Merge learners button--%>
+                <asp:Button ID="btnMergeLearners" style="margin-bottom:10px" Text="Merge Learners" CssClass="btn btn-primary tooltips" runat="server" Enabled="false" OnClick="btnMergeLearners_Click" data-placement="right" title="Before merging two users, edit them to match all field values." />
+            </td>
+            <td style="width: 1%; white-space: nowrap;"> <%--Download Excel button--%>
+                <asp:LinkButton ID="lnkSaveExcel" CssClass="btn btn-primary" runat="server" OnClick="lnkSaveExcel_Click" style="margin-bottom:10px" ToolTip="Download">
+                    <span aria-hidden="true" class="glyphicon glyphicon-download-alt"></span>
+                </asp:LinkButton>
+            </td>
+            <td  style="width: 1%; white-space: nowrap;">  <%--New Add Learner button--%>
+                <asp:LinkButton ID="lnkAddLearner" CssClass="btn btn-primary" runat="server" OnClick="lnkAddLearner_Click" style="margin-bottom:10px" ToolTip="Add Learner">
+                    <span aria-hidden="true" class="glyphicon glyphicon-plus"></span>
+                </asp:LinkButton>
+            </td>
+        </tr>
+    </table>
+    
+    
 </div>
 <br />
     <asp:GridView ID="gvLearners" runat="server" CssClass="table table-striped table-bordered" AutoGenerateColumns="false" AllowSorting="true" OnRowDataBound="gvLearners_RowDataBound">  <%--AllowPaging="True">--%>

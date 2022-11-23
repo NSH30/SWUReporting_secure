@@ -76,6 +76,15 @@ namespace SWUReporting {
         protected global::System.Web.UI.WebControls.Panel pnlPopup;
         
         /// <summary>
+        /// Title control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label Title;
+        
+        /// <summary>
         /// tbName control.
         /// </summary>
         /// <remarks>
@@ -227,6 +236,15 @@ namespace SWUReporting {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.LinkButton lnkSaveExcel;
+        
+        /// <summary>
+        /// lnkAddLearner control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton lnkAddLearner;
         
         /// <summary>
         /// gvLearners control.
