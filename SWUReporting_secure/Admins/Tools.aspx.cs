@@ -38,6 +38,11 @@ namespace SWUReporting
             ModalPopupExtender2.Show();
         }
 
+        protected void btnAdd_EditUsers_Click(object sender, EventArgs e)
+        {
+            ModalPopupExtender3.Show();
+        }
+
 
         protected void btnClose_Click(object sender, EventArgs e)
         {
@@ -156,21 +161,33 @@ namespace SWUReporting
 
         }
 
+        protected void btnCloseUsers_Click(object sender, EventArgs e)
+        {
+
+        }
+
         protected void btnAddUsers_click(object sender, EventArgs e)
         {
+            string Fname = UserFname.Text;
+            string Lname = UserLname.Text;
+            string Trigram = UserTrigram.Text;
+
+            if (Fname != null && Lname != null && UserTrigram != null)
+            {
+                DBReporting dbr = new DBReporting();
+                DB db = new DB();
+                db.Connect();
+                DBReporting.db = db;
 
 
+            }
         }
-
         protected void btnEditUsers_click(object sender, EventArgs e)
         {
-
+            
         }
 
-        protected void btnAdd_EditUsers_Click(object sender, EventArgs e)
-        {
-            ModalPopupExtender3.Show();
-        }
+        
     }
 
 }

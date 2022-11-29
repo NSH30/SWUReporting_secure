@@ -202,6 +202,24 @@ namespace SWUReporting {
         protected global::System.Web.UI.WebControls.TextBox UserTrigram;
         
         /// <summary>
+        /// Admin control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButton Admin;
+        
+        /// <summary>
+        /// NotAdmin control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButton NotAdmin;
+        
+        /// <summary>
         /// btnAddUsers control.
         /// </summary>
         /// <remarks>
@@ -211,13 +229,13 @@ namespace SWUReporting {
         protected global::System.Web.UI.WebControls.Button btnAddUsers;
         
         /// <summary>
-        /// btnEditUsers control.
+        /// btnCloseUsers control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnEditUsers;
+        protected global::System.Web.UI.WebControls.Button btnCloseUsers;
         
         /// <summary>
         /// ModalPopupExtender1 control.

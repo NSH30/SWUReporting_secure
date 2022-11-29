@@ -1,6 +1,6 @@
 ﻿<%@ Page Language="C#" MasterPageFile="~/Site.Master" MaintainScrollPositionOnPostback="true"  AutoEventWireup="true" CodeBehind="Learners.aspx.cs" Inherits="SWUReporting.Learners" %>
 
-<%@ Register Src="~/Controls/EditLearnersControl.ascx" TagPrefix="uc1" TagName="EditLearnersControl" %>
+<%@ Register Src="/Controls/EditLearnersControl.ascx" TagPrefix="uc1" TagName="EditLearnersControl" %>
 
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
     <br />

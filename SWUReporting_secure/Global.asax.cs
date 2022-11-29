@@ -28,7 +28,7 @@ namespace SWUReporting_secure
             if (exc is HttpUnhandledException)
             {
                 // Pass the error on to the error page.
-                Server.Transfer("Error.aspx?handler=Application_Error%20-%20Global.asax", true);
+                Server.Transfer("/Error.aspx?handler=Application_Error%20-%20Global.asax", true);
             }
         }
     }

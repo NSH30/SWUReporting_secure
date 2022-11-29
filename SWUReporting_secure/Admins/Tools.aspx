@@ -1,5 +1,6 @@
-﻿<%@ Page Language="C#" Title="SWU Reporting - Tools" MasterPageFile="~/Site.Master"  AutoEventWireup="true" CodeBehind="Tools.aspx.cs" Inherits="SWUReporting.Tools" %>
+﻿<%@ Page Language="C#" Title="SWU Reporting - Tools" MasterPageFile="/Site.Master"  AutoEventWireup="true" CodeBehind="Tools.aspx.cs" Inherits="SWUReporting.Tools" %>
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="cc1" %>
+
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
     <h3>Admin Tools</h3>
     <div class="form-inline">
@@ -95,7 +96,7 @@
     </asp:Panel>
 
     <!--Add/Edit Users -->
-    <cc1:ModalPopupExtender ID="ModalPopupExtender3" BehaviorID="mpe3" runat="server" PopupControlID="Panelusers" TargetControlID="AddUsers" BackgroundCssClass="modalBackground" CancelControlID="btnCloseUsers" />
+    <cc1:ModalPopupExtender ID="ModalPopupExtender3" BehaviorID="mpe3" runat="server" PopupControlID="PanelUsers" TargetControlID="AddUsers" BackgroundCssClass="modalBackground" CancelControlID="btnCloseUsers" />
     <asp:Panel ID="PanelUsers" runat="server" CssClass="modal-dialog" Style="display: none;">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -105,12 +106,17 @@
                 <div class="modal-body">
                     <p>First Name: &nbsp &nbsp &nbsp <asp:TextBox ID="UserFname" CssClass="form-control " Width="250px" runat="server" Rows="1"></asp:TextBox></p>
                     <p>Last Name: &nbsp &nbsp &nbsp <asp:TextBox ID="UserLname" CssClass="form-control " Width="250px" runat="server" Rows="1"></asp:TextBox></p>
-                    <p>Trigram: &nbsp &nbsp &nbsp <asp:TextBox ID="UserTrigram" CssClass="form-control " Width="250px" runat="server" Rows="1"></asp:TextBox></p>                                        
+                    <p>Trigram: &nbsp &nbsp &nbsp <asp:TextBox ID="UserTrigram" CssClass="form-control " Width="250px" runat="server" Rows="1"></asp:TextBox></p>
+                  <div>  
+                    <asp:RadioButton ID="Admin" runat="server" Text="Yes" GroupName="Admin" />  
+                    <asp:RadioButton ID="NotAdmin" runat="server" Text="No" GroupName="Admin" />  
+                  </div>
                 </div>
                 <div class="modal-footer">
                     <asp:Button ID="btnAddUsers" runat="server" Text="Add Users" CssClass="modal-close btn" Onclick="btnAddUsers_click"/>
-                    <asp:Button ID="btnEditUsers" runat="server" Text="Edit Users" CssClass="modal-close btn" Onclick="btnEditUsers_click"/>                    
-                </div>                
+                    <asp:Button ID="btnCloseUsers" runat="server" Text="Close" CssClass="modal-close btn" OnClick="btnCloseUsers_Click"/>
+                   <%-- <asp:Button ID="btnEditUsers" runat="server" Text="Edit Users" CssClass="modal-close btn" Onclick="btnEditUsers_click"/>--%>
+               </div>                
             </div>
         </div>
     </asp:Panel>
