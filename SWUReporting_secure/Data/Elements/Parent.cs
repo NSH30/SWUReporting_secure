@@ -2,7 +2,7 @@
 using System.Data.SqlClient;
 
 
-namespace ReportBuilder
+namespace SWUReporting
 {
 
     public class Parent

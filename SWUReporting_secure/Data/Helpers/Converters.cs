@@ -4,7 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Web;
 
-namespace ReportBuilder
+namespace SWUReporting
 {
     public class Converters
     {

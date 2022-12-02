@@ -2,7 +2,7 @@
 using SWUReporting.Data;
 using System.IO;
 
-namespace ReportBuilder
+namespace SWUReporting
 {
     static class Testing
     {

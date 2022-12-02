@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ReportBuilder
+namespace SWUReporting
 {
 
     public class Report

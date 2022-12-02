@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Web.UI.WebControls;
-using ReportBuilder;
+using SWUReporting;
 using System.Data;
 using SWUReporting.Data;
 

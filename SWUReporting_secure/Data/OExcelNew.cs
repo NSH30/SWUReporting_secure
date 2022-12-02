@@ -7,7 +7,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using System.IO;
 using System.Data;
 
-namespace ReportBuilder
+namespace SWUReporting
 {
     class OExcelNew
     {

@@ -19,7 +19,7 @@ namespace SWUReporting
             var startDate = tbSearchDate.Text;
             var searchString = tbSearchString.Text;
             string endSearchDate = tbEndSearchDate.Text;
-            vac.ShowResults(startDate, searchString, endSearchDate,  ReportBuilder.DB.dataSource.search, cbCompleted.Checked);
+            vac.ShowResults(startDate, searchString, endSearchDate,  SWUReporting.DB.dataSource.search, cbCompleted.Checked);
             vac.Visible = true;
         }
     }

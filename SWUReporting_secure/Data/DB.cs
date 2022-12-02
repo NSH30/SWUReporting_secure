@@ -7,7 +7,7 @@ using System.Configuration;
 using SWUReporting;
 using System.Linq;
 
-namespace ReportBuilder
+namespace SWUReporting
 {
     public class DB
     {

@@ -5,7 +5,7 @@ using System.Text;
 using SWUReporting.Data;
 using System.Collections.Generic;
 
-namespace ReportBuilder
+namespace SWUReporting
 {
 
     public class ReportIO

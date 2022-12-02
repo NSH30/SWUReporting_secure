@@ -1,4 +1,4 @@
-﻿using ReportBuilder;
+﻿using SWUReporting;
 using System;
 using System.Data;
 using System.IO;
@@ -34,7 +34,7 @@ namespace SWUReporting
             string filePath = "";
             Report r = new Report();
 
-
+            //Upload and save the file to the server
             if (Uploader.HasFile)
             {
                 try
@@ -57,20 +57,14 @@ namespace SWUReporting
                 }
             }
 
-           
-
-            
-
+            //if successful, import the file
             lblMessage.Text = sb.ToString();
             if (success)
-            {
-                DBReporting dbr = new DBReporting();
+            {                
                 DB db = new DB();
-                db.Connect();
-                DBReporting.db = db;
-                r = dbr.ImportCSV(filePath);
-                db.Disconnect();
-                DBReporting.db = null;
+                db.Connect();                
+                r = Importer.ImportCSV(filePath, db);
+                db.Disconnect();             
             }
             try
             {
@@ -82,6 +76,7 @@ namespace SWUReporting
                 //ignore failure to delete the import file
             }
 
+            //log the results and show in the UI
             Messaging.logresults(r.Message);
             lblMessage.Text = "Import completed!";
             //load import message first            

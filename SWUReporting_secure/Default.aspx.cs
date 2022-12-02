@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using ReportBuilder;
+using SWUReporting;
 using SWUReporting.Data;
 using System.Data;
 
@@ -285,7 +285,7 @@ namespace SWUReporting
             string searchEndDate = tbSearchEndDate.Text;
            
             //added new checkbox for sales roles only (Stefanie request) Dec. 21, 2021
-            vac.ShowResults(startDate,searchEndDate, searchString, ReportBuilder.DB.dataSource.search, cbCompleted.Checked, cbSalesOnly.Checked);
+            vac.ShowResults(startDate,searchEndDate, searchString, SWUReporting.DB.dataSource.search, cbCompleted.Checked, cbSalesOnly.Checked);
             vac.Visible = true;
         }
 

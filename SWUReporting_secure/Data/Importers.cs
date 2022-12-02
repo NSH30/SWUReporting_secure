@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.FileIO;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 
-namespace ReportBuilder
+namespace SWUReporting
 {
     public class Importer
     {
@@ -30,6 +32,107 @@ namespace ReportBuilder
         }
         #endregion
 
+        #region Import Learner Transcripts
+
+        /// <summary>
+        /// Import Learner Transcripts from CSV saved on the server
+        /// </summary>
+        /// <param name="csvPath">full path to CSV file on the server</param>
+        /// <param name="db">connected instance of DB class</param>
+        /// <returns></returns>
+        public static Report ImportCSV(string csvPath, DB db)
+        {
+            //Read the contents of CSV file.  
+            string csvData = File.ReadAllText(csvPath);
+
+            //generate unique lists
+            List<Company> companies = new List<Company>();  //this needs user intervention - mapping to alias and parent
+            List<Learner> learners = new List<Learner>();
+            List<Course> courses = new List<Course>();
+            //weekly will be csv (comma separated)
+            List<Activity> activities = parseCSV(csvData, out companies, out learners, out courses, db, delimiter: ReportIO.sep); // "\t");
+
+            //run the database imports            
+            var res = batchImport(activities, companies, learners, courses, db);
+            return res;
+        }
+
+        /// <summary>
+        /// Batch import all records from lists, then do database cleanup
+        /// </summary>
+        /// <param name="activities"></param>
+        /// <param name="companies"></param>
+        /// <param name="learners"></param>
+        /// <param name="courses"></param>
+        /// <returns></returns>
+        protected static Report batchImport(List<Activity> activities, List<Company> companies,
+            List<Learner> learners, List<Course> courses, DB db)
+        {
+            int companyCount = 0;
+            int learnerCount = 0;
+            Report r = new Report();
+            r.CountOnly = false;
+
+            //company
+            foreach (var c in companies)
+            {
+                if (c.Insert())
+                {
+                    companyCount++;
+                    r.AddLine("NEW COMPANY: " + c.Name);
+                    r.AddCompany(c);
+                }
+            }
+            //learner
+            foreach (var l in learners)
+            {
+                if (l.Insert())
+                {
+                    learnerCount++;
+                    r.AddLine("NEW LEARNER: " + l.Name + " " + l.email);
+                    r.AddLearner(l);
+                }
+            }
+            //course
+            foreach (var cs in courses)
+            {
+                if (cs.Insert())
+                {
+                    r.AddLine("NEW COURSE: " + cs.Name);
+                    r.AddCourse(cs);
+                }
+            }
+            //activity
+            //TODO: Creating duplicate activities July 5, 2022
+            foreach (var a in activities)
+            {
+                //a.Insert();
+                a.Insert2();  //new method for 2023
+            }
+            //cleanup unenrolled activities
+            try
+            {
+                db.deleteUnenrolledActivities();
+            }
+            catch (Exception ex)
+            {
+                //ignore the error                
+                r.AddLine("Failed to remove unenrollments: " + ex.Message);
+            }
+            try
+            {
+                db.CleanOrphanVARs();
+            }
+            catch (Exception ex2)
+            {
+                //ignore the error                
+                r.AddLine("Failed to clean VARs: " + ex2.Message);
+            }
+
+            return r;
+        }
+
+        #endregion
         #region Virtual Tester Importer
 
         public void ImportVT(string filepath)
@@ -262,9 +365,141 @@ namespace ReportBuilder
                 DB.SimpleQuery(insertQuery);
             }
             return dt;
-        }     
+        }
 
         #endregion
+        #endregion
+
+        #region Data Tools
+        //activities are the primary returned List, companies, learners and courses are also returned
+        //companies, learners and courses are empty coming in
+        /// <summary>
+        /// Transfer CSV data into structures - no filtering for existing activities
+        /// </summary>
+        /// <param name="csvData">CSV data read to a string</param>
+        /// <param name="companies">Output List of Company</param>
+        /// <param name="learners">Output List of Learner</param>
+        /// <param name="courses">Output List of Course</param>
+        /// <param name="delimiter">CSV delimiter character</param>
+        /// <returns>List of Activity</returns>
+        protected static List<Activity> parseCSV(string csvData, out List<Company> companies,
+            out List<Learner> learners, out List<Course> courses, DB db, string delimiter = ",")
+        {
+            TextFieldParser parser = new TextFieldParser(new StringReader(csvData));
+
+            parser.HasFieldsEnclosedInQuotes = true;
+            parser.SetDelimiters(delimiter);
+
+            List<Activity> activities = new List<Activity>();
+            companies = new List<Company>();
+            learners = new List<Learner>();
+            courses = new List<Course>();
+            string[] data;
+            string[] headers = null;
+            bool firstLine = true;
+            while (!parser.EndOfData)
+            {
+                data = parser.ReadFields();
+                if (firstLine)
+                {
+                    //headers - ignore for now
+                    headers = data;
+                }
+                else
+                {
+
+                    Learner l = new Learner(db);
+                    Activity a = new Activity(db);
+                    Company c = new Company(db);
+                    Course cs = new Course(db);
+
+                    //company data
+                    c.Name = data[TableTools.getHeaderIndex(headers, "Company DS")];  //field changed October 18 2021 to "Company DS"
+                    var t = companies.Find(x => (x.Name == c.Name));
+                    if (t == null)
+                    {
+                        companies.Add(c);
+                    }
+                    else
+                    {
+                        c = t;
+                    }
+                    //course data                    
+                    cs.Type = data[TableTools.getHeaderIndex(headers, "Type")];
+                    if (data[TableTools.getHeaderIndex(headers, "Course")] == "")
+                    {
+                        switch (cs.Type)
+                        {
+                            case "Course":
+                                cs.Name = data[TableTools.getHeaderIndex(headers, "Course")]; //data[6];
+                                break;
+                            case "Learning Path":
+                                cs.Name = data[TableTools.getHeaderIndex(headers, "LP/Certification/Course")]; // data[4];
+                                break;
+                            case "Certification":
+                                cs.Name = data[TableTools.getHeaderIndex(headers, "LP/Certification/Course")]; // data[4];
+                                break;
+                            default:
+                                //shouldn't happen
+                                cs.Name = data[TableTools.getHeaderIndex(headers, "Course")]; //data[6];
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        cs.Name = data[TableTools.getHeaderIndex(headers, "Course")]; //data[6];
+                    }
+                    var csTemp = courses.Find(x => (x.Name == cs.Name && x.Type == cs.Type));
+                    if (csTemp == null)
+                    {
+                        courses.Add(cs);
+                    }
+                    else
+                    {
+                        cs = csTemp;
+                    }
+                    //Learner data
+                    l.Name = data[TableTools.getHeaderIndex(headers, "Name")]; //data[0];
+                    l.email = data[TableTools.getHeaderIndex(headers, "email")]; //data[1];
+                    l.company = c;
+                    l.Region = data[TableTools.getHeaderIndex(headers, "Region")]; //data[32];
+                    l.Country = data[TableTools.getHeaderIndex(headers, "Country")]; //data[34];
+                    l.Role = data[TableTools.getHeaderIndex(headers, "Role")]; //data[35];
+                    l.GEO = data[TableTools.getHeaderIndex(headers, "GEO")]; //data[33];
+                    l.Profile = data[TableTools.getHeaderIndex(headers, "profile")]; //data[29];
+                    l.userState = data[TableTools.getHeaderIndex(headers, "userState")]; //data[28];
+
+                    var lTemp = learners.Find(x => (x.Name == l.Name && x.email == l.email && x.company == l.company));
+                    if (lTemp == null)
+                    {
+                        learners.Add(l);
+                    }
+                    else
+                    {
+                        l = lTemp;
+                    }
+                    //activity data
+                    a.course = cs;
+                    a.learner = l;
+                    a.enrollDate = Converters.getDateFromString(data[TableTools.getHeaderIndex(headers, "Enrollment Date (UTC TimeZone)")]); // DateTime.Parse(data[15]);
+                    a.startDate = Converters.getDateFromString(data[TableTools.getHeaderIndex(headers, "Started Date (UTC TimeZone)")]); // DateTime.Parse(data[16]);
+                    a.completionDate = Converters.getDateFromString(data[TableTools.getHeaderIndex(headers, "Completion Date (UTC TimeZone)")]); // DateTime.Parse(data[17]);
+                    a.status = data[TableTools.getHeaderIndex(headers, "Status")]; //data[20];
+                    //new fields for DELMIAWORKS team Sept. 23, 2021
+                    a.progress = Converters.getDecimalFromString(data[TableTools.getHeaderIndex(headers, "Progress %")]);
+                    a.quizScore = Converters.getDecimalFromString(data[TableTools.getHeaderIndex(headers, "Quiz_score")]);
+                    a.SelectionCriteria = data[TableTools.getHeaderIndex(headers, "Selection Criteria")];
+                    activities.Add(a);
+                }
+                firstLine = false;
+            }
+            parser.Close();
+
+            //now have unique lists of learners, companies, courses and activities
+            return activities;
+        }
+
+
         #endregion
     }
 }

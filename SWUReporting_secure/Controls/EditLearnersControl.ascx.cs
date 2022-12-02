@@ -1,4 +1,4 @@
-﻿using ReportBuilder;
+﻿using SWUReporting;
 using SWUReporting.Data;
 using System;
 using System.Collections.Generic;
@@ -352,7 +352,7 @@ namespace SWUReporting
         protected void lnkActivities_Click(object sender, EventArgs e)
         {
             learnerID = Convert.ToInt32((sender as LinkButton).CommandArgument);
-            DB db = new ReportBuilder.DB();
+            DB db = new SWUReporting.DB();
             db.Connect();
             Learner l = new Learner(db);            
             l.GetLearnerByID(learnerID);

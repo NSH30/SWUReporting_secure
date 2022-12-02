@@ -17,7 +17,7 @@ namespace SWUReporting
         protected void btnSearch_Click(object sender, EventArgs e)
         {
             //fill the datagrid then show it
-            editCourseControl.ShowResults(tbSearch.Text, ReportBuilder.DB.dataSource.search);
+            editCourseControl.ShowResults(tbSearch.Text, SWUReporting.DB.dataSource.search);
             editCourseControl.Visible = true;
             editCourseAliasControl.Visible = false;
         }

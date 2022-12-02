@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using ReportBuilder;
+using SWUReporting;
 
 namespace SWUReporting
 {
@@ -30,7 +30,7 @@ namespace SWUReporting
         {
             string search = tbSearch.Text;
             EditCompanyControl.UsedSearch = true;
-            ecc2.ShowResults(search, ReportBuilder.DB.dataSource.search);
+            ecc2.ShowResults(search, SWUReporting.DB.dataSource.search);
             ecc2.Visible = true;
             EditAliasControl.Visible = false;
         }

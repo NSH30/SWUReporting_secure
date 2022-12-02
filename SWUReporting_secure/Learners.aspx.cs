@@ -1,4 +1,4 @@
-﻿using ReportBuilder;
+﻿using SWUReporting;
 using System;
 
 namespace SWUReporting
