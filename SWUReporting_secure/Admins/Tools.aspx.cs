@@ -40,7 +40,7 @@ namespace SWUReporting
 
         protected void btnAdd_EditUsers_Click(object sender, EventArgs e)
         {
-            ModalPopupExtender3.Show();
+            //ModalPopupExtender3.Show();
         }
 
 
@@ -130,7 +130,7 @@ namespace SWUReporting
 
         protected void btnUpdateCourse_Click(object sender, EventArgs e)
         {
-            string emailVal = tbEmailsCheck.Text;           ;
+            string emailVal = tbEmailsCheck.Text;         
 
             if(tbName.Text == String.Empty) {
                 Messaging.SendAlert("Please enter a course name",this.Page);
@@ -161,33 +161,14 @@ namespace SWUReporting
 
         }
 
-        protected void btnCloseUsers_Click(object sender, EventArgs e)
+        protected void btnUserSearch_Click(object sender, EventArgs e)
         {
-
+            DBReporting dbr = new DBReporting();
+            DB db = new DB();            
+            db.Connect();
+            DBReporting.db = db;            
+            //UserOperations.GetUsersSearchres(UserTextbox.Text);
         }
-
-        protected void btnAddUsers_click(object sender, EventArgs e)
-        {
-            string Fname = UserFname.Text;
-            string Lname = UserLname.Text;
-            string Trigram = UserTrigram.Text;
-
-            if (Fname != null && Lname != null && UserTrigram != null)
-            {
-                DBReporting dbr = new DBReporting();
-                DB db = new DB();
-                db.Connect();
-                DBReporting.db = db;
-
-
-            }
-        }
-        protected void btnEditUsers_click(object sender, EventArgs e)
-        {
-            
-        }
-
-        
     }
 
 }

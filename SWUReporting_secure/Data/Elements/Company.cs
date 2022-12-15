@@ -50,7 +50,7 @@ namespace ReportBuilder
                             from VARs
                             full outer join VARAlias on VARAlias.ID = VARs.var_alias_id
                             full outer join VARParents on VARParents.ID = VARs.var_parent_id
-                            where VARs.Name = @varName;";
+                            where VARs.Name = @varName;";     
             cmd = new SqlCommand(query, db.dbConn);
             cmd.Parameters.AddWithValue("@varName", companyName);
             SqlDataReader r = cmd.ExecuteReader();

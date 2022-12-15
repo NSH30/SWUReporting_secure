@@ -51,10 +51,13 @@
             <p>Manually add or Edit user access for admin or non-admin privileges</p>
         </div>
         <div >
-            <br />
-            <asp:Button ID="add_editUser" Text="Add Users" CssClass="btn btn-primary" runat="server" OnClick="btnAdd_EditUsers_Click"/>            
+            <br />            
+                    <asp:TextBox ID="UserTextbox" runat="server" CssClass="form-control" placeholder="Search" Style="display:inline"></asp:TextBox>             
+                    <asp:LinkButton runat="server" ID="btnUserSearch" CssClass="btn form-inline" placeholder="Search" OnClick="btnUserSearch_Click">                    
+                    <span aria-hidden="true" class="btn glyphicon glyphicon-search" />
+                    </asp:LinkButton>                                    
         </div>  
-        <br />             
+        <br />         
     </div>
 <%--    <div class="container p-5 shadow" style="background-color:whitesmoke">
         <div>
@@ -96,7 +99,7 @@
     </asp:Panel>
 
     <!--Add/Edit Users -->
-    <cc1:ModalPopupExtender ID="ModalPopupExtender3" BehaviorID="mpe3" runat="server" PopupControlID="PanelUsers" TargetControlID="AddUsers" BackgroundCssClass="modalBackground" CancelControlID="btnCloseUsers" />
+<%--    <cc1:ModalPopupExtender ID="ModalPopupExtender3" BehaviorID="mpe3" runat="server" PopupControlID="PanelUsers" TargetControlID="AddUsers" BackgroundCssClass="modalBackground" CancelControlID="btnCloseUsers" />
     <asp:Panel ID="PanelUsers" runat="server" CssClass="modal-dialog" Style="display: none;">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -115,11 +118,11 @@
                 <div class="modal-footer">
                     <asp:Button ID="btnAddUsers" runat="server" Text="Add Users" CssClass="modal-close btn" Onclick="btnAddUsers_click"/>
                     <asp:Button ID="btnCloseUsers" runat="server" Text="Close" CssClass="modal-close btn" OnClick="btnCloseUsers_Click"/>
-                   <%-- <asp:Button ID="btnEditUsers" runat="server" Text="Edit Users" CssClass="modal-close btn" Onclick="btnEditUsers_click"/>--%>
+                   <asp:Button ID="btnEditUsers" runat="server" Text="Edit Users" CssClass="modal-close btn" Onclick="btnEditUsers_click"/>
                </div>                
             </div>
         </div>
-    </asp:Panel>
+    </asp:Panel>--%>
 
     <!--Delete Learners --->
     <cc1:ModalPopupExtender ID="ModalPopupExtender1" BehaviorID="mpe2" runat="server" PopupControlID="pnlEmails" TargetControlID="lnkDummy" BackgroundCssClass="modalBackground" CancelControlID="btnClose"/>

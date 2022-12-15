@@ -19,6 +19,7 @@
                     <asp:CheckBox ID="chkShowDeleted" CssClass="checkbox form-check-label" runat="server" Text="Show DELETED learners"/>
                 </asp:Panel>
             </td>
+
             <td>
                 <div class="form-inline">
                     <asp:Button ID="btnShowDuplicates" runat="server" CssClass="btn" style="margin-right:5px" Text="Duplicate Learners" OnClick="btnShowDuplicates_Click" />
