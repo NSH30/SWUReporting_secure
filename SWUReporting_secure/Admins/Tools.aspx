@@ -20,7 +20,6 @@
     </div>
     <br/>
     <br/>
-
     <div class="form-inline">
         <asp:Button ID="addcourse" runat="server" style="display:none" />
     </div>
@@ -50,15 +49,19 @@
             <h4>Add/Edit Users</h4>
             <p>Manually add or Edit user access for admin or non-admin privileges</p>
         </div>
-        <div >
+        <div>
             <br />            
                     <asp:TextBox ID="UserTextbox" runat="server" CssClass="form-control" placeholder="Search" Style="display:inline"></asp:TextBox>             
                     <asp:LinkButton runat="server" ID="btnUserSearch" CssClass="btn form-inline" placeholder="Search" OnClick="btnUserSearch_Click">                    
                     <span aria-hidden="true" class="btn glyphicon glyphicon-search" />
-                    </asp:LinkButton>                                    
+                    </asp:LinkButton>
+                    <asp:LinkButton runat="server" ID="btnAdd" CssClass="btn form-inline" OnClick="btnAdd_Click">
+                    <span class="btn btn-primary">Add</span>
+                    </asp:LinkButton>
         </div>  
         <br />         
     </div>
+
 <%--    <div class="container p-5 shadow" style="background-color:whitesmoke">
         <div>
             <h4>Download Raw Learner Data</h4>
@@ -98,31 +101,31 @@
         </div>
     </asp:Panel>
 
-    <!--Add/Edit Users -->
-<%--    <cc1:ModalPopupExtender ID="ModalPopupExtender3" BehaviorID="mpe3" runat="server" PopupControlID="PanelUsers" TargetControlID="AddUsers" BackgroundCssClass="modalBackground" CancelControlID="btnCloseUsers" />
+    <!--Add Users -->
+    <cc1:ModalPopupExtender ID="ModalPopupExtender3" BehaviorID="mpe3" runat="server" PopupControlID="PanelUsers" TargetControlID="AddUsers" BackgroundCssClass="modalBackground" CancelControlID="btnCloseUsers" />
     <asp:Panel ID="PanelUsers" runat="server" CssClass="modal-dialog" Style="display: none;">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 class="modal-title">Add/Edit Users</h3>
+                    <h3 class="modal-title"><asp:Label ID ="lblHeader" Text="Add Users" runat="server" /></h3>                    
                 </div>
                 <div class="modal-body">
                     <p>First Name: &nbsp &nbsp &nbsp <asp:TextBox ID="UserFname" CssClass="form-control " Width="250px" runat="server" Rows="1"></asp:TextBox></p>
                     <p>Last Name: &nbsp &nbsp &nbsp <asp:TextBox ID="UserLname" CssClass="form-control " Width="250px" runat="server" Rows="1"></asp:TextBox></p>
                     <p>Trigram: &nbsp &nbsp &nbsp <asp:TextBox ID="UserTrigram" CssClass="form-control " Width="250px" runat="server" Rows="1"></asp:TextBox></p>
                   <div>  
-                    <asp:RadioButton ID="Admin" runat="server" Text="Yes" GroupName="Admin" />  
-                    <asp:RadioButton ID="NotAdmin" runat="server" Text="No" GroupName="Admin" />  
+                  <%--<p> Admin: <asp:RadioButton ID="Admin" runat="server" Text="Yes" GroupName="Admin" />  
+                    <asp:RadioButton ID="NotAdmin" runat="server" Text="No" GroupName="Admin" />  </p>--%>
+                      <asp:CheckBox ID="chkAdmin" CssClass="checkbox form-check-label" runat="server" Text="Admin"/>
                   </div>
                 </div>
                 <div class="modal-footer">
-                    <asp:Button ID="btnAddUsers" runat="server" Text="Add Users" CssClass="modal-close btn" Onclick="btnAddUsers_click"/>
-                    <asp:Button ID="btnCloseUsers" runat="server" Text="Close" CssClass="modal-close btn" OnClick="btnCloseUsers_Click"/>
-                   <asp:Button ID="btnEditUsers" runat="server" Text="Edit Users" CssClass="modal-close btn" Onclick="btnEditUsers_click"/>
+                    <asp:Button ID="btnAddUsers" runat="server" Text="Save" CssClass="modal-close btn btn-primary" OnClick="btnAddUsers_Click"/>
+                    <asp:Button ID="btnCloseUsers" runat="server" Text="Close" CssClass="modal-close btn" OnClick="btnCloseUsers_Click"/>                   
                </div>                
             </div>
         </div>
-    </asp:Panel>--%>
+    </asp:Panel>
 
     <!--Delete Learners --->
     <cc1:ModalPopupExtender ID="ModalPopupExtender1" BehaviorID="mpe2" runat="server" PopupControlID="pnlEmails" TargetControlID="lnkDummy" BackgroundCssClass="modalBackground" CancelControlID="btnClose"/>
@@ -137,9 +140,23 @@
             </div>
             <div class="modal-footer">                
                 <asp:Button ID="btnUpdate" runat="server" Text="Update" CssClass="btn btn-primary" OnClick="btnUpdate_Click" />
-                <asp:Button ID="btnClose" runat="server" Text="Close" CssClass="modal-close btn" OnClick="btnClose_Click" />
+                <asp:Button ID="btnClose" runat="server" Text="Close" CssClass="modal-close btn" OnClick="btnCloseUsers_Click" />
             </div>
         </div>
     </div>
-</asp:Panel>  
+</asp:Panel> 
+    <asp:GridView ID="gvUsers" runat="server" CssClass="table table-striped table-bordered" AutoGenerateColumns="false" AllowSorting="true" OnRowDataBound="gvUsers_RowDataBound">  <%--AllowPaging="True">--%>
+        <Columns>                      
+            <asp:BoundField DataField="Fname" HeaderText="FirstName" />
+            <asp:BoundField DataField="Lname" HeaderText="LastName" />
+            <asp:BoundField DataField="Trigram" HeaderText="Trigram" />
+            <asp:BoundField DataField="Admin" HeaderText="Is Admin?" />
+            <asp:TemplateField>
+                <ItemTemplate>
+                    <asp:LinkButton ID="lnkEdit" Text="Edit" runat="server" CommandArgument='<%# Eval("Trigram") %>' OnClick="lnkEdit_Click"/>
+                </ItemTemplate>
+            </asp:TemplateField>            
+        </Columns>
+    </asp:GridView>
 </asp:Content>
+

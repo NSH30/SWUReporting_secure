@@ -230,6 +230,15 @@ namespace ReportBuilder
             return TableQuery(cmd, query);
         }
 
+        internal DataTable GetUserSearchRes(string filter)
+        {
+            string query = "select * from Users where fname like @filter or lname like @filter or trigram like @filter;";
+            SqlCommand cmd = new SqlCommand(query, dbConn);
+
+            cmd.Parameters.AddWithValue("@filter", filter);
+            return TableQuery(cmd, query);
+        }
+
         internal void CreateTempTables()
         {
             try

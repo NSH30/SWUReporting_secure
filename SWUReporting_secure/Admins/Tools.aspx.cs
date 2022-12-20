@@ -11,6 +11,9 @@ namespace SWUReporting
 {
     public partial class Tools : System.Web.UI.Page
     {
+        private static bool EditingUser = false;
+
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -37,11 +40,7 @@ namespace SWUReporting
         {
             ModalPopupExtender2.Show();
         }
-
-        protected void btnAdd_EditUsers_Click(object sender, EventArgs e)
-        {
-            //ModalPopupExtender3.Show();
-        }
+    
 
 
         protected void btnClose_Click(object sender, EventArgs e)
@@ -162,13 +161,103 @@ namespace SWUReporting
         }
 
         protected void btnUserSearch_Click(object sender, EventArgs e)
-        {
-            DBReporting dbr = new DBReporting();
-            DB db = new DB();            
-            db.Connect();
-            DBReporting.db = db;            
-            //UserOperations.GetUsersSearchres(UserTextbox.Text);
+        {           
+            DB db = new DB();
+            DataTable dt = null;
+            db.Connect();            
+            string searchText = UserTextbox.Text;
+            try
+            {                
+                string escapedFilter = string.Format("%{0}%", searchText);
+                dt = db.GetUserSearchRes(filter: escapedFilter);                
+                db.Disconnect();
+                gvUsers.DataSource = dt;
+                gvUsers.DataBind();                                
+            }
+            catch (Exception ex)
+            {
+
+                Messaging.SendAlert(ex.Message, Page);
+            }
+
         }
+
+        protected void btnAdd_Click(object sender, EventArgs e)
+        {
+            UserFname.Text = "";
+            UserLname.Text = "";
+            UserTrigram.Text = "";
+            chkAdmin.Checked = false;
+            EditingUser = false;
+            lblHeader.Text = "Add User";
+            UserTrigram.Enabled = true;
+            ModalPopupExtender3.Show();
+        }
+
+        protected void btnAddUsers_Click(object sender, EventArgs e)
+        {            
+            DB db = new DB();
+            db.Connect();            
+
+            User u = new User();
+            u.db = db;
+            u.FirstName = UserFname.Text;
+            u.LastName = UserLname.Text;
+            u.Trigram = UserTrigram.Text;
+            
+            int IntAdmin = chkAdmin.Checked ? 1 : 0;
+            u.Admin = IntAdmin;
+
+            if (EditingUser)
+            {
+                //Editing User
+                u.editUser();
+            }
+            else
+            { 
+                u.Adduser();
+            }
+
+        }
+
+        //Set Editing User
+        protected void btnCloseUsers_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void lnkEdit_Click(object sender, EventArgs e)
+        {
+
+            DB db = new DB();
+            db.Connect();
+            //Query to find User by Trigram 
+            string Trigram = (sender as LinkButton).CommandArgument;
+            User u = new User();
+            u.db = db;
+            u.GetUserByTrigram(Trigram);
+            UserFname.Text = u.FirstName;
+            UserLname.Text = u.LastName;
+            UserTrigram.Text = u.Trigram;
+            db.Disconnect();
+            if (u.Admin == 1)
+            {
+                chkAdmin.Checked = true;
+
+            }
+            else
+            {
+                chkAdmin.Checked = false;
+
+            }
+            lblHeader.Text = "Edit User";
+            EditingUser = true;
+            UserTrigram.Enabled = false;
+            ModalPopupExtender3.Show();
+
+           
+        }
+        
     }
 
 }

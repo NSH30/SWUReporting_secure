@@ -621,13 +621,13 @@ namespace ReportBuilder
             return r.Message;
         }
 
-        public void setUserNameBatch(List<User> users, string conString)
-        {
-            foreach (var userDef in users)
-            {
-                db.SetUserName(userName: userDef.userName, newName: userDef.newName);
-            }
-        }
+        //public void setUserNameBatch(List<User> users, string conString)
+        //{
+        //    foreach (var userDef in users)
+        //    {
+        //        db.SetUserName(userName: userDef.userName, newName: userDef.newName);
+        //    }
+        //}
 
         public string getMissingEmails(List<string> emails)
         {
