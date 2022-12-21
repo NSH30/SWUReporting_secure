@@ -1,0 +1,263 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using ReportBuilder;
+using System.Data;
+
+namespace SWUReporting_TEST
+{
+    public partial class Tools : System.Web.UI.Page
+    {
+        private static bool EditingUser = false;
+
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (!IsPostBack)
+            {
+                ////GEO selection to filter VAR Alias report
+                //DB db = new DB();
+                //db.Connect();
+
+                //ddGEOs.DataSource = db.Geos;
+                //db.Disconnect();
+                //ddGEOs.DataTextField = "GEO";
+                //ddGEOs.DataValueField = "ID";
+                //ddGEOs.DataBind();
+                //ddGEOs.Items.Insert(0, new ListItem("All GEOs", "-1"));
+            }
+        }
+
+        protected void btnBatchDelete_Click(object sender, EventArgs e)
+        {
+            ModalPopupExtender1.Show();
+        }
+
+        protected void btnAddCourse_Click(object sender, EventArgs e)
+        {
+            ModalPopupExtender2.Show();
+        }
+    
+
+
+        protected void btnClose_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void btnUpdate_Click(object sender, EventArgs e)
+        {
+            string emailVal = tbEmails.Text;
+            string results = null;
+            List<string> emails = new List<string>(
+                emailVal.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries));
+            if (emails.Count != 0)
+            {
+                DBReporting dbr = new DBReporting();
+                DB db = new DB();
+                db.Connect();
+                DBReporting.db = db;
+                bool deletedStatus = true; //assume batch deletion, not batch active
+                results = dbr.setUserStateBatch(emails: emails, deletedStatus: deletedStatus);
+                db.Disconnect();
+            }
+            else
+            {
+                //some error or warning back to the user
+            }
+            if (results == "0")
+            {
+                lblBDResponse.CssClass = "label label-warning";
+                lblBDResponse.Text = "No learners updated.";
+            }
+            else
+            {
+                lblBDResponse.CssClass = "label label-info";
+                lblBDResponse.Text = results;
+            }            
+        }
+
+        protected void btnDownload_Click(object sender, EventArgs e)
+        {
+            //DB db = new DB();
+            //db.Connect();
+            //string geoFilter = "";
+            //if (ddGEOs.SelectedIndex > 0)
+            //{
+            //    geoFilter = ddGEOs.SelectedItem.Text;
+            //}
+
+            //DataTable res = db.GetRecentActivities(new DateTime(1995,1,1), tbSearchFilter.Text, cbShowDeleted.Checked, geoFilter); //db.GetLearnerSearchRes(tbSearchFilter.Text, geoFilter, cbShowDeleted.Checked);
+            //db.Disconnect();
+            //res.TableName = "RawLearnerData";
+            //DBReporting.DownloadSingleSheet(res);
+        }
+
+        protected void btnCheck_Click(object sender, EventArgs e)
+        {
+            string emailVal = tbEmailsCheck.Text;
+            string results = null;
+            List<string> emails = new List<string>(
+                emailVal.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries));
+            if (emails.Count != 0)
+            {
+                DBReporting dbr = new DBReporting();
+                DB db = new DB();
+                db.Connect();
+                DBReporting.db = db;            
+                results = dbr.getMissingEmails(emails: emails);
+                db.Disconnect();
+            }
+            else
+            {
+                //some error or warning back to the user                
+            }
+            if (results == "0")
+            {
+                lblBDResponse.CssClass = "label label-warning";
+                lblBDResponse.Text = "No learners updated.";
+            }
+            else
+            {
+                lblBDResponse.CssClass = "label label-info";
+                lblBDResponse.Text = results;
+            }
+        }
+
+        protected void btnUpdateCourse_Click(object sender, EventArgs e)
+        {
+            string emailVal = tbEmailsCheck.Text;         
+
+            if(tbName.Text == String.Empty) {
+                Messaging.SendAlert("Please enter a course name",this.Page);
+                return;
+            }
+            if (tbDate.Text == String.Empty)
+            {
+                Messaging.SendAlert("Please enter a Date", this.Page);
+                return;
+            }
+            DateTime CourseDate = DateTime.Parse(tbDate.Text);
+            String CourseName = tbName.Text;    
+
+            List<string> emails = new List<string>(
+                emailVal.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries));
+            DBReporting dbr = new DBReporting();
+            DB db = new DB();
+            Report r = new Report();
+            db.Connect();
+            DBReporting.db = db;
+            r = dbr.BatchLoadActivities(CourseName,CourseDate,emails);
+            tbMessage.Text = r.Message;
+            tbMessage.Visible = true;
+        }
+
+        protected void btnCloseCourse_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void btnUserSearch_Click(object sender, EventArgs e)
+        {           
+            DB db = new DB();
+            DataTable dt = null;
+            db.Connect();            
+            string searchText = UserTextbox.Text;
+            try
+            {                
+                string escapedFilter = string.Format("%{0}%", searchText);
+                dt = db.GetUserSearchRes(filter: escapedFilter);                
+                db.Disconnect();
+                gvUsers.DataSource = dt;
+                gvUsers.DataBind();                                
+            }
+            catch (Exception ex)
+            {
+
+                Messaging.SendAlert(ex.Message, Page);
+            }
+
+        }
+
+        protected void btnAdd_Click(object sender, EventArgs e)
+        {
+            UserFname.Text = "";
+            UserLname.Text = "";
+            UserTrigram.Text = "";
+            chkAdmin.Checked = false;
+            EditingUser = false;
+            lblHeader.Text = "Add User";
+            UserTrigram.Enabled = true;
+            ModalPopupExtender3.Show();
+        }
+
+        protected void btnAddUsers_Click(object sender, EventArgs e)
+        {            
+            DB db = new DB();
+            db.Connect();            
+
+            User u = new User();
+            u.db = db;
+            u.FirstName = UserFname.Text;
+            u.LastName = UserLname.Text;
+            u.Trigram = UserTrigram.Text;
+            
+            int IntAdmin = chkAdmin.Checked ? 1 : 0;
+            u.Admin = IntAdmin;
+
+            if (EditingUser)
+            {
+                //Editing User
+                u.editUser();
+            }
+            else
+            { 
+                u.Adduser();
+            }
+
+        }
+
+        //Set Editing User
+        protected void btnCloseUsers_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void lnkEdit_Click(object sender, EventArgs e)
+        {
+
+            DB db = new DB();
+            db.Connect();
+            //Query to find User by Trigram 
+            string Trigram = (sender as LinkButton).CommandArgument;
+            User u = new User();
+            u.db = db;
+            u.GetUserByTrigram(Trigram);
+            UserFname.Text = u.FirstName;
+            UserLname.Text = u.LastName;
+            UserTrigram.Text = u.Trigram;
+            db.Disconnect();
+            if (u.Admin == 1)
+            {
+                chkAdmin.Checked = true;
+
+            }
+            else
+            {
+                chkAdmin.Checked = false;
+
+            }
+            lblHeader.Text = "Edit User";
+            EditingUser = true;
+            UserTrigram.Enabled = false;
+            ModalPopupExtender3.Show();
+
+           
+        }
+        
+    }
+
+}
