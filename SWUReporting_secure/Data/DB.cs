@@ -1558,10 +1558,11 @@ namespace SWUReporting
         public bool CreateTransposedTempTable2(string varFilter = "%", string profileFilter = "%", string geoFilter = "%")
         {
             int rows = 0;
+            //changed CASE WHEN a.status.  The ELSE was 'In Progress', now  a.status to show expired courses (row 4)
             string query = @"Declare @roleFilter varchar(10) = '[siv]%', @kpi int;
                 --create initial completions temp table
                 select a.[order], a.domain_id, l.ID, l.Name, l.email, l.fte_value as [FTE Value], l.Role, l.VAR_Alias as [VAR Alias], l.company, l.Country, l.GEO, 
-                CASE WHEN a.status = 'completed' THEN CONVERT(varchar, MAX(a.completionDate), 101) ELSE 'In Progress' END as [Completion Date], a.CourseNameAlias, a.alignment_points
+                CASE WHEN a.status = 'completed' THEN CONVERT(varchar, MAX(a.completionDate), 101) ELSE a.status END as [Completion Date], a.CourseNameAlias, a.alignment_points
                 INTO #completions
                 FROM ActivitiesDetail a RIGHT OUTER JOIN AllActiveLearners l on l.ID = a.learner_id
                 --WHERE l.profile = 'reseller' AND l.GEO like @geoFilter AND l.VAR_Alias like @varFilter
