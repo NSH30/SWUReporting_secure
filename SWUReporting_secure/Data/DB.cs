@@ -781,62 +781,6 @@ namespace SWUReporting
         #endregion
 
         #region Report Queries
-        //OBSOLETE version to use Learner.fte_value and only sales (no tech-sales) if filter is %sales% - and include VAR owner in points
-        internal DataTable getAlignmentByGEO3(string varFilter, string geoFilter, string roleFilter = "%sales%")
-        {
-            string query;
-            query = @"select GEOs.GEO, VARParents.VAR_Parent as [VAR], sum(Learners.fte_value) as [FTE Value], 
-                    pts.TotalPoints,
-                    CAST(ISNULL(pts.TotalPoints / NULLIF(sum(Learners.fte_value), 0), 0) AS float) as [Weighted Achievement]
-                    from Learners
-                    Join VARs on VARs.ID = Learners.var_id
-                    join VARParents on VARParents.ID = VARs.var_parent_id
-                    join GEOs on GEOs.ID = Learners.geo_id
-                    join (
-                    select tblLearnerPoints.ID, sum(alignment_points) as TotalPoints
-                    , VAR_Parent as [VAR]
-                    , (@salesGoal) AS Goal
-                        from ( 
-                    select distinct GEOs.ID as GEOID, CourseAlias.CourseNameAlias
-                        , Learners.Name, CourseAlias.alignment_points
-	                    , VARParents.VAR_Parent, VARParents.ID, Activities.status
-                        from Learners join VARs on VARs.ID = Learners.var_id
-	                    join VARParents on VARParents.ID = VARs.var_parent_id
-                        join Activities on Activities.learner_id = Learners.ID
-                        join Courses on Courses.ID = Activities.course_id
-                        join CourseAlias on CourseAlias.ID = Courses.alias_id
-	                    join GEOs on GEOs.ID = Learners.geo_id
-                        join VARAlias on VARAlias.ID = VARs.var_alias_id
-	                    where VAR_Parent like @VARFilter
-                        AND Activities.status = 'Completed'
-                        AND Learners.userState = 'ACTIVE'
-                        #ROLEFILTER#
-                        AND alignment_points > 0
-	                    AND GEOs.GEO like @geofilter
-	                    AND VAR_Parent not like 'solidworks corp.'  --ignore DS employees
-                        AND VARAlias.status = 1  --active VARs only
-	                    ) as tblLearnerPoints
-	                    group by VAR_Parent , tblLearnerPoints.ID
-	                    ) as pts on pts.VAR = VARParents.VAR_Parent
-                        where Learners.userState = 'ACTIVE'
-	                    Group By VARParents.VAR_Parent, GEO, pts.TotalPoints
-	                    ORDER BY GEO, VAR;";
-            if (roleFilter == "%sales%")
-            {
-                query = query.Replace("#ROLEFILTER#", " AND (Learners.Role like @roleFilter OR Learners.Role like '%owner%') AND Learners.Role not like 'tech%sales' ");
-            }
-            else
-            {
-                query = query.Replace("#ROLEFILTER#", " AND Learners.Role like @roleFilter ");
-            }
-
-            SqlCommand cmd = new SqlCommand(query, dbConn);
-            cmd.Parameters.AddWithValue("@varFilter", varFilter);
-            cmd.Parameters.AddWithValue("@roleFilter", roleFilter);
-            cmd.Parameters.AddWithValue("@geoFilter", geoFilter);
-            cmd.Parameters.AddWithValue("@salesGoal", SalesAlignmentGoal);
-            return TableQuery(cmd, query);
-        }
 
         /// <summary>
         /// Generate alignment report based on VARParents
@@ -2600,28 +2544,6 @@ namespace SWUReporting
             var res = cmd.ExecuteScalar();
             count = Convert.ToDouble(res);
             return count;
-        }
-
-        //this was based on Mike Puckett's technical certification scoring in Virtual Tester
-        //no current plan to use this method in reporting
-        internal DataTable GetTechnicalAlignment(string varFilter = "%", string geoFilter = "%")
-        {
-            DataTable table = new DataTable();
-            string query = @"select distinct GEO, VAR_Alias as [VAR], TechPoints.ATS as [ATS Value], 
-                            TechPoints.[D/E], TechPoints.GOV, TechPoints.[M/P], TechPoints.[M/S], TechPoints.SIM
-                            , (([D/E] + [M/P] + [M/S] + SIM + GOV) * 0.65) as [Weighted Achievement]
-                            from VARs
-                            join TechPoints on TechPoints.companyID = VARs.companyID
-                            join VARAlias on VARAlias.ID = VARs.var_alias_id
-                            join GEOs on GEOs.ID = VARAlias.geo_id
-                            where GEO like @geofilter AND VAR_Alias like @varfilter
-                            order by GEO, VAR_Alias";
-            using (var cmd = new SqlCommand(query, dbConn))
-            {
-                cmd.Parameters.AddWithValue("@varFilter", varFilter);
-                cmd.Parameters.AddWithValue("@geofilter", geoFilter);
-                return TableQuery(cmd, query);
-            }
         }
 
         #endregion

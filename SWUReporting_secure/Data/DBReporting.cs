@@ -780,6 +780,14 @@ namespace SWUReporting
         #endregion
 
         #region DataManipluation
+        /// <summary>
+        /// Load a single course with multiple emails of attendees.
+        /// Create the course if it does not yet exist.
+        /// </summary>
+        /// <param name="CourseName"></param>
+        /// <param name="date"></param>
+        /// <param name="emails"></param>
+        /// <returns>Report class containing return message of all results.</returns>
         public Report BatchLoadActivities(string CourseName, DateTime date, List<string> emails)
         {
             Report r = new Report();
@@ -824,7 +832,12 @@ namespace SWUReporting
         }
     
         
-
+        /// <summary>
+        /// FTE Import tool
+        /// </summary>
+        /// <param name="learners"></param>
+        /// <param name="companies"></param>
+        /// <returns></returns>
         private Report BatchImportLearners(List<Learner> learners, List<Company> companies)
         {
             int companyCount = 0; 

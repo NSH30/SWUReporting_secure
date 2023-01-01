@@ -107,7 +107,7 @@ namespace SWUReporting
             foreach (var a in activities)
             {
                 //a.Insert();
-                a.Insert2();  //new method for 2023
+                a.Insert2();
             }
             //cleanup unenrolled activities
             try
