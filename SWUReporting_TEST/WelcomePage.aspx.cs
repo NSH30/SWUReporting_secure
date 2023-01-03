@@ -35,8 +35,8 @@ namespace SWUReporting_TEST
             db.Connect();
             String UserName = System.Web.HttpContext.Current.User.Identity.Name;
             String AuthUser = string.Empty;
-            String[] separator = { "DSONE//" };            
-            String[] Trigram = UserName.Split(separator,StringSplitOptions.None);
+            String[] separator = { "DSONE\\" };            
+            String[] Trigram = UserName.Split(separator,StringSplitOptions.RemoveEmptyEntries);
 
             ////load the stats
 
