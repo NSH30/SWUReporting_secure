@@ -7,13 +7,11 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SWUReporting_TEST
-{
-
-
-    public partial class SiteMaster
-    {
-
+namespace SWUReporting_TEST{
+    
+    
+    public partial class SiteMaster {
+        
         /// <summary>
         /// reports control.
         /// </summary>
@@ -22,7 +20,7 @@ namespace SWUReporting_TEST
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl reports;
-
+        
         /// <summary>
         /// edit control.
         /// </summary>
@@ -31,7 +29,7 @@ namespace SWUReporting_TEST
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl edit;
-
+        
         /// <summary>
         /// learners control.
         /// </summary>
@@ -49,7 +47,7 @@ namespace SWUReporting_TEST
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl companies;
-
+        
         /// <summary>
         /// courses control.
         /// </summary>
@@ -58,7 +56,7 @@ namespace SWUReporting_TEST
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl courses;
-
+        
         /// <summary>
         /// alignment control.
         /// </summary>
@@ -67,7 +65,7 @@ namespace SWUReporting_TEST
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl alignment;
-
+        
         /// <summary>
         /// targets control.
         /// </summary>
@@ -76,7 +74,7 @@ namespace SWUReporting_TEST
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl targets;
-
+        
         /// <summary>
         /// admin control.
         /// </summary>
@@ -85,7 +83,7 @@ namespace SWUReporting_TEST
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl admin;
-
+        
         /// <summary>
         /// MainContent control.
         /// </summary>
@@ -95,7 +93,6 @@ namespace SWUReporting_TEST
         /// </remarks>
         protected global::System.Web.UI.WebControls.ContentPlaceHolder MainContent;
         
-
         /// <summary>
         /// lblStats control.
         /// </summary>
