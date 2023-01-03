@@ -1,4 +1,4 @@
-﻿<%@ Page Title="SWU Reporting - Welcome" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="WelcomePage.aspx.cs" Inherits="SWUReporting.WelcomePage" %>
+﻿<%@ Page Title="SWU Reporting - Welcome" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="WelcomePage.aspx.cs" Inherits="SWUReporting_TEST.WelcomePage" %>
 <asp:Content ID="BodyCOntent" ContentPlaceHolderID="MainContent" runat="server">   
 
 <script src="/SWUReporting/bundles/MsAjaxJs?v=c42ygB2U07n37m_Sfa8ZbLGVu4Rr2gsBo7MvUEnJeZ81" type="text/javascript"></script>
