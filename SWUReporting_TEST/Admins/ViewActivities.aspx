@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" MasterPageFile="~/Site.Master" MaintainScrollPositionOnPostback="true" AutoEventWireup="true" CodeBehind="ViewActivities.aspx.cs" Inherits="SWUReporting.ViewActivities" %>
+﻿<%@ Page Language="C#" MasterPageFile="~/Site.Master" MaintainScrollPositionOnPostback="true" AutoEventWireup="true" CodeBehind="ViewActivities.aspx.cs" Inherits="SWUReporting_TEST.ViewActivities" %>
 
 <%@ Register Src="~/Controls/ViewActivitiesControl.ascx" TagPrefix="uc9" TagName="ViewActivitiesControl" %>
 

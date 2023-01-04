@@ -1,4 +1,4 @@
-﻿<%@ Page Title="SWU Reporting - User Management" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="UserManagement.aspx.cs" Inherits="SWUReporting.UserManagement" %>
+﻿<%@ Page Title="SWU Reporting - User Management" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="UserManagement.aspx.cs" Inherits="SWUReporting_TEST.UserManagement" %>
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
     <h4>User/Admin Management</h4>
       

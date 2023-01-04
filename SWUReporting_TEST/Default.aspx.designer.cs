@@ -208,7 +208,7 @@ namespace SWUReporting_TEST {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::SWUReporting_TEST.ViewActivitiesControl vac;
+        protected global::SWUReporting.ViewActivitiesControl vac;
         
         /// <summary>
         /// tbSearchFilter control.

@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" MaintainScrollPositionOnPostback="true" CodeBehind="EditCompanies.aspx.cs" Inherits="SWUReporting.EditCompanies" MasterPageFile="~/Site.Master" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" MaintainScrollPositionOnPostback="true" CodeBehind="EditCompanies.aspx.cs" Inherits="SWUReporting_TEST.EditCompanies" MasterPageFile="~/Site.Master" %>
 <%@ Register Src="~/Controls/EditCompanyControl.ascx" TagPrefix="uc5" TagName="ECC" %>
 <%@ Register Src="~/Controls/EditAliasControl.ascx" TagPrefix="uc5" TagName="EditAliasControl" %>
 

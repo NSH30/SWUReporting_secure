@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="EditCustomTargets.aspx.cs" Inherits="SWUReporting.EditCustomTargets" MasterPageFile="~/Site.Master" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="EditCustomTargets.aspx.cs" Inherits="SWUReporting_TEST.EditCustomTargets" MasterPageFile="~/Site.Master" %>
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="cc1" %>
 
 <%-- This functionality is not used - Mike Spens July 25, 2022 --%>

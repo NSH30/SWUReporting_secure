@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" MaintainScrollPositionOnPostback="true" CodeBehind="EditCourses.aspx.cs" Inherits="SWUReporting.EditCourses"  MasterPageFile="~/Site.Master" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" MaintainScrollPositionOnPostback="true" CodeBehind="EditCourses.aspx.cs" Inherits="SWUReporting_TEST.EditCourses"  MasterPageFile="~/Site.Master" %>
 <%@ Register Src="~/Controls/EditCourseControl.ascx" TagPrefix="ecc9" TagName="EditCourseControl" %>
 <%@ Register Src="~/Controls/EditCourseAliasControl.ascx" TagPrefix="ecac1" TagName="EditCourseAliasControl" %>
 

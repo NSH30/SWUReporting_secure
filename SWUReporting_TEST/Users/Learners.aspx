@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" MasterPageFile="~/Site.Master" MaintainScrollPositionOnPostback="true"  AutoEventWireup="true" CodeBehind="Learners.aspx.cs" Inherits="SWUReporting.Learners" %>
+﻿<%@ Page Language="C#" MasterPageFile="~/Site.Master" MaintainScrollPositionOnPostback="true"  AutoEventWireup="true" CodeBehind="Learners.aspx.cs" Inherits="SWUReporting_TEST.Learners" %>
 
 <%@ Register Src="/Controls/EditLearnersControl.ascx" TagPrefix="uc1" TagName="EditLearnersControl" %>
 

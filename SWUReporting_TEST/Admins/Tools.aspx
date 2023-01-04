@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" Title="SWU Reporting - Tools" MasterPageFile="/Site.Master"  AutoEventWireup="true" CodeBehind="Tools.aspx.cs" Inherits="SWUReporting.Tools" %>
+﻿<%@ Page Language="C#" Title="SWU Reporting - Tools" MasterPageFile="/Site.Master"  AutoEventWireup="true" CodeBehind="Tools.aspx.cs" Inherits="SWUReporting_TEST.Tools" %>
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="cc1" %>
 
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">

@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" Title="SWU Reporting - Import" MaintainScrollPositionOnPostback="true" AutoEventWireup="true" MasterPageFile="~/Site.Master"  CodeBehind="Import.aspx.cs" Inherits="SWUReporting.Import" %>
+﻿<%@ Page Language="C#" Title="SWU Reporting - Import" MaintainScrollPositionOnPostback="true" AutoEventWireup="true" MasterPageFile="~/Site.Master"  CodeBehind="Import.aspx.cs" Inherits="SWUReporting_TEST.Import" %>
 
 <%@ Register Src="~/Controls/EditLearnersControl.ascx" TagPrefix="uc1" TagName="ELC" %>
 
